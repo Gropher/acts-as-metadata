@@ -1,0 +1,3 @@
+module ActsAsMetadata
+  VERSION = "0.0.2"
+end
