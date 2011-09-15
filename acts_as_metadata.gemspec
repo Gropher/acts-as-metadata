@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Gropher"]
   s.email       = ["grophen@gmail.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Additional on-demand fields for ActiveRecord models}
+  s.description = %q{This gem allows to add additional database-stored fields to your models}
 
   s.rubyforge_project = "acts_as_metadata"
 
