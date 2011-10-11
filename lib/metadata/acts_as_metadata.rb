@@ -36,7 +36,7 @@ module ActsAsMetadata
       end
 
 			def metadata_hash
-			  Rails.cache.fetch('metadata_#{@@metadata_model}_#{self.id}')
+			  Rails.cache.fetch('metadata_#{@@metadata_model}_#{self.id}') do
 				  Hash[self.metadata.all.map{ |m| [m.metadata_type, m.value] }] unless @metadata_hash
 				end
 			end          
