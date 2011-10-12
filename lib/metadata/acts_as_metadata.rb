@@ -32,7 +32,7 @@ module ActsAsMetadata
       def set_metadata(name, value)
         type = MetadataType.type(name, self.send(@@metadata_scope))
         value = value ? value : type.default
-        self.metadata.where(:metadata_type => name).destroy_all
+        self.metadata.where(:metadata_type => name).each{|m| m.detroy(true)}
         self.metadata.create({:metadata_type => name, :value => value})
 				Rails.cache.delete("metadata_#{@@metadata_model}_#{self.id}")
       end
