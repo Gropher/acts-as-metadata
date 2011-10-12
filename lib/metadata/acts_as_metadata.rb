@@ -12,6 +12,7 @@ module ActsAsMetadata
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
       
       def method_missing(meth, *args, &block)
+        meth = meth.to_s
   	    if meth.to_s =~ /^(.+)=$/
   	      meth = meth[0..-2]
   	      if metadata_types.include?(meth)
