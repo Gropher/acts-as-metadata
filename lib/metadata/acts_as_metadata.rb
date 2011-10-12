@@ -18,32 +18,27 @@ module ActsAsMetadata
       
       def create_accessors
         metadata_types.each do |type|
+          puts "--------------attr_accessor :#{type}--------------"
           class_eval "attr_accessor :#{type}"
         end
       end
       
       def method_missing(meth, *args, &block)
-        Rails.logger.info "--------------#{meth}-------------------\n"
-        Rails.logger.info "--------------#{args.to_json}-------------------\n"
-        begin
-          super
-        rescue NoMethodError
-          meth = meth.to_s
-    	    if meth =~ /^(.+)=$/
-    	      meth = meth[0..-2]
-    	      if metadata_types.include?(meth)
-    	        set_metadata(meth, args.first)
-    	      else
-    	        raise
-    	      end
-    	    else
-    	      if metadata_types.include?(meth)
-    	        get_metadata(meth)
-    	      else
-    	        raise
-    	      end
-    	    end
-    	  end
+        name = meth.to_s
+  	    if name =~ /^(.+)=$/
+  	      name = name[0..-2]
+  	      if metadata_types.include?(name)
+  	        set_metadata(name, args.first)
+  	      else
+  	        super
+  	      end
+  	    else
+  	      if metadata_types.include?(name)
+  	        get_metadata(name)
+  	      else
+  	        super
+  	      end
+  	    end
   	  end
   	  
   	  def model_name
