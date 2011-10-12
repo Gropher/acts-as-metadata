@@ -11,9 +11,16 @@ module ActsAsMetadata
 		class_eval do
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
       
+      def mass_assignment_authorizer
+          super + metadata_types
+        end
+      end
+      
       def method_missing(meth, *args, &block)
+        Rails.logger.info "--------------#{meth}-------------------\n"
+        Rails.logger.info "--------------#{args.to_json}-------------------\n"
         meth = meth.to_s
-  	    if meth.to_s =~ /^(.+)=$/
+  	    if meth =~ /^(.+)=$/
   	      meth = meth[0..-2]
   	      if metadata_types.include?(meth)
   	        set_metadata(meth, args.first)
