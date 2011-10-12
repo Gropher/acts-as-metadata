@@ -8,21 +8,35 @@ module ActsAsMetadata
 		end
 		
 		MetadataType.instance_variable_set("@metadata_scope", scope)
-		MetadataType.class_variable_set("@@metadata_scope", scope)
 		class_eval "@@metadata_scope = :#{scope}"
     class_eval "@@metadata_model = :#{model}"
 		class_eval do
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
       
+      def method_missing(meth, *args, &block)
+        type_names = MetadataType.model_types()
+  	    if meth.to_s =~ /^(.+)=$/
+  	      meth = meth[0..-2]
+  	      if type_names.include?(meth)
+  	        set_metadata(meth, args.first)
+  	      else
+  	        super
+  	      end
+  	    else
+  	      if type_names.include?(meth)
+  	        get_metadata(meth)
+  	      else
+  	        super
+  	      end
+  	    end
+  	  end
+      
       def metadata_types
-        types = MetadataType.model_types(@@metadata_model.to_sym, self.send(@@metadata_scope))
-        #types = types.map{|t| MetadataType.type(t).send(@@metadata_scope) == self.send(@@metadata_scope) ? t : nil}.compact if @@metadata_scope
-        return types
+        MetadataType.model_types(@@metadata_model.to_sym, self.send(@@metadata_scope))
       end
 
 			def self.metadata_types(scope=nil)
 				types = MetadataType.model_types(@@metadata_model, scope)
-        #types = types.map{|t| MetadataType.type(t).send(@@metadata_scope) == scope.id ? t : nil}.compact if @@metadata_scope
         return types
 			end
       
@@ -33,8 +47,8 @@ module ActsAsMetadata
       def set_metadata(name, value)
         type = MetadataType.type(name, self.send(@@metadata_scope))
         value = value ? value : type.default
-        self.metadata.where(:metadata_type => name).each{|m| m.detroy(true)}
-        self.metadata.create({:metadata_type => name, :value => value})
+        self.metadata.where(:metadata_type => name).each{|m| m.destroy(true)}
+        self.metadata.create({ :metadata_type => name, :value => value })
 				Rails.cache.delete("metadata_#{@@metadata_model}_#{self.id}")
       end
 
@@ -43,16 +57,6 @@ module ActsAsMetadata
 				  Hash[self.metadata.all.map { |m| [m.metadata_type, m.value] }]
 				end
 			end          
-    end
-    MetadataType.model_types(model).each do |name|
-      type = MetadataType.type(name)
-      #if type.mandatory
-      #  class_eval "validates :#{name}, :presence => true"  
-      #end
-      class_eval "attr_accessor :#{name}"
-      class_eval "attr_accessible :#{name}"
-      class_eval "def #{name}\n get_metadata(\"#{name}\") \nend"
-      class_eval "def #{name}=(value)\n set_metadata(\"#{name}\", value) \nend"  
     end
   end
 end

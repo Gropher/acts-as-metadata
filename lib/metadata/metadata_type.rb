@@ -1,4 +1,4 @@
-class MetadataType < ActiveRecord::Base
+class MetadataType < ActiveRecord::Base  
   DATATYPES = {
     :string => "string",
     :text => "text",
@@ -13,10 +13,12 @@ class MetadataType < ActiveRecord::Base
   serialize :values
   serialize :models
   after_create :set_default_values
-  after_update :drop_cache
-  before_destroy :drop_cache
+  after_update :refresh_metadata
+  before_destroy :refresh_metadata
 	attr_accessor :models_json, :values_json, :default_json
-  attr_accessible  :tag, :name, :description, :models, :mandatory, :default, :format, :datatype, :values, :models_json, :values_json, :default_json
+  attr_accessible  :tag, :name, :description, :models, :mandatory, 
+    :default, :format, :datatype, :values, 
+    :models_json, :values_json, :default_json
   validates :tag, :presence => true, :format => {:with => /[a-z]+/}
   validates :datatype, :presence => true
   default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
@@ -33,11 +35,6 @@ class MetadataType < ActiveRecord::Base
       :values => nil
     })
   end
-  
-#  def destroy
-#    self.run_callbacks(:destroy)
-#    self.update_attribute(:deleted_at, Time.now.utc)
-#  end
  
 	def models_json
 		self.models ? self.models.to_json : [].to_json
@@ -71,7 +68,7 @@ class MetadataType < ActiveRecord::Base
         if scheme_data.count > 0
           scheme_data
         else
-           []
+          []
         end
       end
 		end
@@ -89,12 +86,12 @@ class MetadataType < ActiveRecord::Base
   
   def self.model_types(model, scope=nil)
     model_types = Rails.cache.fetch("metadata_scheme_#{@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
-       res = {:any => []}
+       res = { :any => [] }
        self.scheme(scope).each do |tag, type|
-         type['models'].each do |model| 
-      	   res[model] = [] if !res[model]
+         type.models.each do |model| 
+      	   res[model] = [] if res[model].blank?
       	   res[model] << tag
-     	   end if type['models'] 
+     	   end if type.models
      	 end
      	 res
     end
@@ -102,16 +99,13 @@ class MetadataType < ActiveRecord::Base
   end
   
   def self.type(name, scope=nil)
-    self.schenme(scope)[name]
+    self.scheme(scope)[name]
   end
  
-  def self.drop_cache_and_reload(scope=nil)
+  def self.drop_cache(scope=nil)
     Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_data")
     Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_types")
     Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_modeltypes")
-    Dir[File.join(Rails.root, "app", "models", "*.rb")].each do |f|
-      load f
-    end
   end
  
 private 
@@ -120,17 +114,17 @@ private
 		self.values = [] if self.values.nil?
 		self.save
 		if @metadata_scope
-		  MetadataType.drop_cache_and_reload(self.send(@metadata_scope))
+		  MetadataType.drop_cache(self.send(@metadata_scope))
 		else
-		  MetadataType.drop_cache_and_reload
+		  MetadataType.drop_cache
 		end  
 	end 
 
-  def drop_cache
+  def refresh_metadata
     if @metadata_scope
-      MetadataType.drop_cache_and_reload(self.send(@metadata_scope))
+      MetadataType.drop_cache(self.send(@metadata_scope))
     else
-      MetadataType.drop_cache_and_reload
+      MetadataType.drop_cache
     end
   end
 end
