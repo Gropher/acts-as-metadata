@@ -32,7 +32,7 @@ module ActsAsMetadata
         value = value ? value : type.default
         self.metadata.where(:metadata_type => name).destroy_all
         self.metadata.create({:metadata_type => name, :value => value})
-				@metadata_hash = nil
+				Rails.cache.delete("metadata_#{@@metadata_model}_#{self.id}")
       end
 
 			def metadata_hash
