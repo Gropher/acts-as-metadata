@@ -7,7 +7,7 @@ module ActsAsMetadata
 		  scope = nil
 		end
 		
-		MetadataType.class_eval "@metadata_scope = :#{scope}"
+		MetadataType.instance_variable_set("@metadata_scope", scope)s
 		class_eval "@@metadata_scope = :#{scope}"
     class_eval "@@metadata_model = :#{model}"
 		class_eval do
