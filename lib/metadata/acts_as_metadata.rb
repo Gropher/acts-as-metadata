@@ -15,6 +15,13 @@ module ActsAsMetadata
         super + metadata_types
       end
       
+      def initialize(attributes = nil, options = {})
+        super
+        metadata_types.each do |type|
+          instance_variable_set("@type", get_metadata(type))
+        end
+      end
+      
       def method_missing(meth, *args, &block)
         Rails.logger.info "--------------#{meth}-------------------\n"
         Rails.logger.info "--------------#{args.to_json}-------------------\n"
