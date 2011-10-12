@@ -90,10 +90,10 @@ class MetadataType < ActiveRecord::Base
   def self.model_types(model, scope=nil)
     model_types = Rails.cache.fetch("metadata_scheme_#{@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
        res = {:any => []}
-       self.scheme(scope).each do |type|
-         type.models.each do |model| 
+       self.scheme(scope).each do |tag, type|
+         type['models'].each do |model| 
       	   res[model] = [] if !res[model]
-      	   res[model] << type.tag
+      	   res[model] << tag
      	   end if type.models 
      	 end
     end
