@@ -17,6 +17,11 @@ module ActsAsMetadata
         super + metadata_types
       end
       
+      def update_attributes(attributes)
+        create_accessors
+        super
+      end
+      
       def create_accessors
         metadata_types.each do |type|
           puts "--------------attr_accessor :#{type}--------------"
