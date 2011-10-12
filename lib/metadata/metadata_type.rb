@@ -94,7 +94,7 @@ class MetadataType < ActiveRecord::Base
          type['models'].each do |model| 
       	   res[model] = [] if !res[model]
       	   res[model] << tag
-     	   end if type.models 
+     	   end if type['models'] 
      	 end
     end
     model_types[model] ? (model_types[model] | model_types[:any]).uniq : model_types[:any]
