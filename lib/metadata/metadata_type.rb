@@ -118,10 +118,18 @@ private
 		self.models = [] if self.models.nil?
 		self.values = [] if self.values.nil?
 		self.save
-		MetadataType.drop_cache_and_reload(self.send(@metadata_scope))
+		if @metadata_scope
+		  MetadataType.drop_cache_and_reload(self.send(@metadata_scope))
+		else
+		  MetadataType.drop_cache_and_reload
+		end  
 	end 
 
-   def drop_cache
-     MetadataType.drop_cache_and_reload(self.send(@metadata_scope))
-   end
+  def drop_cache
+    if @metadata_scope
+      MetadataType.drop_cache_and_reload(self.send(@metadata_scope))
+    else
+      MetadataType.drop_cache_and_reload
+    end
+  end
 end
