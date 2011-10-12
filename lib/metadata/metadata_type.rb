@@ -103,17 +103,6 @@ class MetadataType < ActiveRecord::Base
   def self.type(name, scope=nil)
     self.schenme(scope)[name]
   end
-  
-  def self.reload_scheme
-		uncached do
-      scheme_data = self.all
-      if scheme_data.count > 0
-        self.scheme = scheme_data
-      else
-        self.scheme = []#self.default.save
-      end
-    end
-  end
  
   def self.drop_cache_and_reload(scope=nil)
     Rails.cache.delete("metadata_scheme_#{@@metadata_scope}#{scope}_data")
