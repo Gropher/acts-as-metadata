@@ -7,15 +7,15 @@ module ActsAsMetadata
 		  scope = nil
 		end
 		
-		MetadataType.class_eval "@@metadata_scope = :#{scope}"
+		MetadataType.class_eval "@metadata_scope = :#{scope}"
 		class_eval "@@metadata_scope = :#{scope}"
     class_eval "@@metadata_model = :#{model}"
 		class_eval do
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
       
       def metadata_types
-        types = MetadataType.model_types(@@metadata_model.to_sym)
-        types = types.map{|t| MetadataType.type(t).send(@@metadata_scope) == self.send(@@metadata_scope) ? t : nil}.compact if @@metadata_scope
+        types = MetadataType.model_types(@@metadata_model.to_sym, self.send(@@metadata_scope))
+        #types = types.map{|t| MetadataType.type(t).send(@@metadata_scope) == self.send(@@metadata_scope) ? t : nil}.compact if @@metadata_scope
         return types
       end
 
