@@ -10,15 +10,15 @@ module ActsAsMetadata
 		class_variable_set("@@metadata_scope", scope)
 		class_eval do
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
+      before_save :create_accessors
       
       def mass_assignment_authorizer
         super + metadata_types
       end
       
-      def initialize(attributes = nil, options = {})
-        super
+      def create_accessors
         metadata_types.each do |type|
-          instance_variable_set("@type", get_metadata(type))
+          class_eval "attr_accessor :#{type}"
         end
       end
       
