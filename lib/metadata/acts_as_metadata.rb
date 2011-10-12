@@ -27,13 +27,17 @@ module ActsAsMetadata
   	      end
   	    end
   	  end
+  	  
+  	  def model_name
+  	    self.class.name.underscore.to_sym
+  	  end
       
       def metadata_types
-        MetadataType.model_types(self.class.name.to_sym, self.send(@@metadata_scope))
+        MetadataType.model_types(model_name, self.send(@@metadata_scope))
       end
 
 			def self.metadata_types(scope=nil)
-				types = MetadataType.model_types(self.class.name, scope)
+				types = MetadataType.model_types(self.name.underscore.to_sym, scope)
         return types
 			end
       
@@ -46,11 +50,11 @@ module ActsAsMetadata
         value = value ? value : type.default
         self.metadata.where(:metadata_type => name).each{|m| m.destroy(true)}
         self.metadata.create({ :metadata_type => name, :value => value })
-				Rails.cache.delete("metadata_#{self.class.name}_#{self.id}")
+				Rails.cache.delete("metadata_#{model_name}_#{self.id}")
       end
 
 			def metadata_hash
-			  Rails.cache.fetch("metadata_#{self.class.name}_#{self.id}", :expires_in => 60.minutes) do
+			  Rails.cache.fetch("metadata_#{model_name}_#{self.id}", :expires_in => 60.minutes) do
 				  Hash[self.metadata.all.map { |m| [m.metadata_type, m.value] }]
 				end
 			end          
