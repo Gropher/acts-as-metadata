@@ -20,8 +20,8 @@ module ActsAsMetadata
       end
 
 			def self.metadata_types(scope=nil)
-				types = MetadataType.model_types(@@metadata_model)
-        types = types.map{|t| MetadataType.type(t).send(@@metadata_scope) == scope.id ? t : nil}.compact if @@metadata_scope
+				types = MetadataType.model_types(@@metadata_model, scope)
+        #types = types.map{|t| MetadataType.type(t).send(@@metadata_scope) == scope.id ? t : nil}.compact if @@metadata_scope
         return types
 			end
       
@@ -30,7 +30,7 @@ module ActsAsMetadata
       end
       
       def set_metadata(name, value)
-        type = MetadataType.type(name)
+        type = MetadataType.type(name, self.send(@@metadata_scope))
         value = value ? value : type.default
         self.metadata.where(:metadata_type => name).destroy_all
         self.metadata.create({:metadata_type => name, :value => value})
