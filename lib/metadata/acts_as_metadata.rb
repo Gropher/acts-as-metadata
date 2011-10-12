@@ -12,8 +12,7 @@ module ActsAsMetadata
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
       
       def mass_assignment_authorizer
-          super + metadata_types
-        end
+        super + metadata_types
       end
       
       def method_missing(meth, *args, &block)
