@@ -31,21 +31,25 @@ module ActsAsMetadata
       end
       
       def method_missing(meth, *args, &block)
-        name = meth.to_s
-  	    if name =~ /^(.+)=$/
-  	      name = name[0..-2]
-  	      if metadata_types.include?(name)
-  	        set_metadata(name, args.first)
-  	      else
-  	        super
-  	      end
-  	    else
-  	      if metadata_types.include?(name)
-  	        get_metadata(name)
-  	      else
-  	        super
-  	      end
-  	    end
+        begin
+          super
+        rescue NoMethodError
+          name = meth.to_s
+    	    if name =~ /^(.+)=$/
+    	      name = name[0..-2]
+    	      if metadata_types.include?(name)
+    	        set_metadata(name, args.first)
+    	      else
+    	        raise
+    	      end
+    	    else
+    	      if metadata_types.include?(name)
+    	        get_metadata(name)
+    	      else
+    	        raise
+    	      end
+    	    end
+    	  end
   	  end
   	  
   	  def model_name
