@@ -85,7 +85,7 @@ class MetadataType < ActiveRecord::Base
   end
   
   def self.model_types(model, scope=nil)
-    model_types = Rails.cache.fetch("metadata_scheme_#{@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
+    types = Rails.cache.fetch("metadata_scheme_#{@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
        res = { :any => [] }
        self.scheme(scope).each do |tag, type|
          type.models.each do |model| 
@@ -95,7 +95,7 @@ class MetadataType < ActiveRecord::Base
      	 end
      	 res
     end
-    model_types[model] ? (model_types[model] | model_types[:any]).uniq : model_types[:any]
+    types[model] ? (types[model] | types[:any]).uniq : types[:any]
   end
   
   def self.type(name, scope=nil)
@@ -103,6 +103,7 @@ class MetadataType < ActiveRecord::Base
   end
  
   def self.drop_cache(scope=nil)
+    Rails.logger.info "=============METADATA DROP CACHE================"
     Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_data")
     Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_types")
     Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_modeltypes")
