@@ -24,8 +24,7 @@ module ActsAsMetadata
       
       def create_accessors
         metadata_types.each do |type|
-          puts "--------------attr_accessor :#{type}--------------"
-          class_eval "attr_accessor :#{type}"
+          instance_variable_set("@#{type}", '')
         end
       end
       
