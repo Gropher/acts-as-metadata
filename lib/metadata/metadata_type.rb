@@ -17,8 +17,8 @@ class MetadataType < ActiveRecord::Base
   before_destroy :drop_cache
 	attr_accessor :models_json, :values_json, :default_json
   attr_accessible  :tag, :name, :description, :models, :mandatory, :default, :format, :datatype, :values, :models_json, :values_json, :default_json
-  validates :tag, :presence => true, :uniqueness => true, :format => {:with => /[a-z]+/}
-  #validates :datatype, :presence => true
+  validates :tag, :presence => true, :format => {:with => /[a-z]+/}
+  validates :datatype, :presence => true
   default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
       
   def self.default
