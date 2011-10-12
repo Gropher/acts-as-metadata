@@ -62,9 +62,9 @@ class MetadataType < ActiveRecord::Base
 
 
   def self.scheme_data(scope=nil)
-    Rails.cache.fetch("metadata_scheme_#{@metadata_scope}#{scope}_data", :expires_in => 60.minutes) do
+    Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_data", :expires_in => 60.minutes) do
 		  uncached do
-        scheme_data = scope.blank? ? self.all : self.where(@metadata_scope => scope).all
+        scheme_data = scope.blank? ? self.all : self.where(@@metadata_scope => scope).all
         if scheme_data.count > 0
           scheme_data
         else
@@ -75,7 +75,7 @@ class MetadataType < ActiveRecord::Base
   end
   
   def self.scheme(scope=nil)
-    Rails.cache.fetch("metadata_scheme_#{@metadata_scope}#{scope}_types", :expires_in => 60.minutes) do
+    Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_types", :expires_in => 60.minutes) do
       res = {}
       self.scheme_data(scope).each do |type|
         res[type.tag] = type
@@ -85,7 +85,7 @@ class MetadataType < ActiveRecord::Base
   end
   
   def self.model_types(model, scope=nil)
-    types = Rails.cache.fetch("metadata_scheme_#{@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
+    types = Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
        res = { :any => [] }
        self.scheme(scope).each do |tag, type|
          type.models.each do |model| 
@@ -103,10 +103,9 @@ class MetadataType < ActiveRecord::Base
   end
  
   def self.drop_cache(scope=nil)
-    Rails.logger.info "=============METADATA DROP CACHE================"
-    Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_data")
-    Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_types")
-    Rails.cache.delete("metadata_scheme_#{@metadata_scope}#{scope}_modeltypes")
+    Rails.cache.delete("metadata_scheme_#{@@metadata_scope}#{scope}_data")
+    Rails.cache.delete("metadata_scheme_#{@@metadata_scope}#{scope}_types")
+    Rails.cache.delete("metadata_scheme_#{@@metadata_scope}#{scope}_modeltypes")
   end
  
 private 
@@ -114,16 +113,16 @@ private
 		self.models = [] if self.models.nil?
 		self.values = [] if self.values.nil?
 		self.save
-		if @metadata_scope
-		  MetadataType.drop_cache(self.send(@metadata_scope))
+		if @@metadata_scope
+		  MetadataType.drop_cache(self.send(@@metadata_scope))
 		else
 		  MetadataType.drop_cache
 		end  
 	end 
 
   def refresh_metadata
-    if @metadata_scope
-      MetadataType.drop_cache(self.send(@metadata_scope))
+    if @@metadata_scope
+      MetadataType.drop_cache(self.send(@@metadata_scope))
     else
       MetadataType.drop_cache
     end

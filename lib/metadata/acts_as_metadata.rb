@@ -6,7 +6,7 @@ module ActsAsMetadata
 		  scope = nil
 		end
 		
-		MetadataType.instance_variable_set("@metadata_scope", scope)
+		MetadataType.class_variable_set("@@metadata_scope", scope)
 		class_variable_set("@@metadata_scope", scope)
 		class_eval do
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
