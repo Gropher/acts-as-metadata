@@ -67,7 +67,7 @@ class MetadataType < ActiveRecord::Base
   def self.scheme_data(scope=nil)
     Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_data", :expires_in => 60.minutes) do
 		  uncached do
-        scheme_data = scope.blank? self.all : self.where(@@metadata_scope => scope)
+        scheme_data = scope.blank? ? self.all : self.where(@@metadata_scope => scope)
         if scheme_data.count > 0
           scheme_data
         else
