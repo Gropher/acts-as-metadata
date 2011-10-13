@@ -19,7 +19,9 @@ class MetadataType < ActiveRecord::Base
   attr_accessible  :tag, :name, :description, :models, :mandatory, 
     :default, :format, :datatype, :values, 
     :models_json, :values_json, :default_json
-  validates :tag, :presence => true, :format => {:with => /[a-z]+/}
+  validates :tag, :presence => true, :format => {:with => /[a-z]+/},
+    :exclusion => { :in => %w(format errors callback action categorie accept attributes host key layout notify open render save template type),
+     :message => "%s - this name is reserved"}
   validates :datatype, :presence => true
   default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
       
