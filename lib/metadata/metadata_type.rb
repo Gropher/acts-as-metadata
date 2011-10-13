@@ -21,7 +21,7 @@ class MetadataType < ActiveRecord::Base
     :models_json, :values_json, :default_json
   validates :tag, :presence => true, :format => {:with => /[a-z]+/},
     :exclusion => { :in => %w(format errors callback action categorie accept attributes host key layout notify open render save template type),
-     :message => "%s - this name is reserved"}
+     :message => "this name is reserved"}
   validates :datatype, :presence => true
   default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
       
