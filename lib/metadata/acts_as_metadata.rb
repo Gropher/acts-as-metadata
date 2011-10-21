@@ -68,7 +68,7 @@ module ActsAsMetadata
 			end
       
       def get_metadata(name)
-				self.metadata_cache[name]
+				self.metadata_cache[name] rescue nil
       end
       
       def set_metadata(name, value)
