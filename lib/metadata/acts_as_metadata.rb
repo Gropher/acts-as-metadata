@@ -66,7 +66,7 @@ module ActsAsMetadata
 			end
       
       def get_metadata(name)
-				self.metadata_hash[name]
+				self.metadata_cache[name]
       end
       
       def set_metadata(name, value)
@@ -74,13 +74,11 @@ module ActsAsMetadata
         value = value ? value : type.default
         self.metadata.where(:metadata_type => name).each{|m| m.destroy(true)}
         self.metadata.create({ :metadata_type => name, :value => value })
-				Rails.cache.delete("metadata_#{model_name}_#{self.id}")
+				self.update_metadata_cache
       end
 
-			def metadata_hash
-			  Rails.cache.fetch("metadata_#{model_name}_#{self.id}", :expires_in => 60.minutes) do
-				  Hash[self.metadata.all.map { |m| [m.metadata_type, m.value] }]
-				end
+			def update_metadata_cache
+				self.metadata_cache = Hash[self.metadata.all.map { |m| [m.metadata_type, m.value] }]
 			end          
     end
   end
