@@ -11,8 +11,8 @@ module ActsAsMetadata
 		class_eval do
       serialize :metadata_cache
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
-      before_create :create_accessors
-      before_update :create_accessors
+      before_create :create_accessors_and_save_metadata
+      before_update :create_accessors_and_save_metadata
 
       
       def mass_assignment_authorizer
@@ -24,12 +24,13 @@ module ActsAsMetadata
         super
       end
       
-      def create_accessors
+      def create_accessors_and_save_metadata
         metadata_types.each do |type|
           class_eval "attr_accessor :#{type}"
           class_eval "def #{type}; get_metadata('#{type}'); end"
           class_eval "def #{type}=(value); set_metadata('#{type}', value); end"
         end
+        save_metadata
       end
       
       def method_missing(meth, *args, &block)
@@ -68,18 +69,24 @@ module ActsAsMetadata
 			end
       
       def get_metadata(name)
-				self.metadata_cache[name] rescue nil
+        load_metadata if !self.metadata_cache.is_a(Hash)
+				self.metadata_cache[name]
       end
       
       def set_metadata(name, value)
         type = MetadataType.type(name, self.send(@@metadata_scope))
-        value = value ? value : type.default
-        self.metadata.where(:metadata_type => name).each{|m| m.destroy(true)}
-        self.metadata.create({ :metadata_type => name, :value => value })
-				self.update_metadata_cache
+        load_metadata if !self.metadata_cache.is_a(Hash)
+        self.metadata_cache[name] = value ? value : type.default
       end
 
-			def update_metadata_cache
+      def save_metadata
+        self.metadata.each{|m| m.destroy(true)}
+        self.metadata_cache.each do |name, value|
+          self.metadata.create({ :metadata_type => name, :value => value })
+        end
+      end
+
+			def load_metadata
 				self.metadata_cache = Hash[self.metadata.all.map { |m| [m.metadata_type, m.value] }]
 			end          
     end
