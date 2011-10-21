@@ -69,13 +69,13 @@ module ActsAsMetadata
 			end
       
       def get_metadata(name)
-        load_metadata if !self.metadata_cache.is_a(Hash)
+        load_metadata if !self.metadata_cache.is_a?(Hash)
 				self.metadata_cache[name]
       end
       
       def set_metadata(name, value)
         type = MetadataType.type(name, self.send(@@metadata_scope))
-        load_metadata if !self.metadata_cache.is_a(Hash)
+        load_metadata if !self.metadata_cache.is_a?(Hash)
         self.metadata_cache[name] = value ? value : type.default
       end
 
@@ -83,7 +83,7 @@ module ActsAsMetadata
         self.metadata.each{|m| m.destroy(true)}
         self.metadata_cache.each do |name, value|
           self.metadata.create({ :metadata_type => name, :value => value })
-        end
+        end if self.metadata_cache.is_a?(Hash)
       end
 
 			def load_metadata
