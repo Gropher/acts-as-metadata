@@ -75,6 +75,7 @@ module ActsAsMetadata
       
       def set_metadata(name, value)
         type = MetadataType.type(name, self.send(@@metadata_scope))
+        raise NoMethodError if type.nil?
         load_metadata if !self.metadata_cache.is_a?(Hash)
         self.metadata_cache[name] = value ? value : type.default
       end
