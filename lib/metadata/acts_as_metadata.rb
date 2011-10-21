@@ -9,9 +9,11 @@ module ActsAsMetadata
 		MetadataType.class_variable_set("@@metadata_scope", scope)
 		class_variable_set("@@metadata_scope", scope)
 		class_eval do
+      serialize :metadata_cache
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
       before_create :create_accessors
       before_update :create_accessors
+
       
       def mass_assignment_authorizer
         super + metadata_types
