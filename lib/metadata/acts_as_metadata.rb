@@ -24,12 +24,16 @@ module ActsAsMetadata
         super
       end
       
-      def create_accessors_and_save_metadata
-        metadata_types.each do |type|
+      def create_accessors
+       metadata_types.each do |type|
           class_eval "attr_accessor :#{type}"
           class_eval "def #{type}; get_metadata('#{type}'); end"
           class_eval "def #{type}=(value); set_metadata('#{type}', value); end"
-        end
+        end 
+      end
+
+      def create_accessors_and_save_metadata
+        create_accessors
         save_metadata
       end
       
