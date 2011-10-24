@@ -81,10 +81,12 @@ module ActsAsMetadata
       end
 
       def save_metadata
-        self.metadata.each{|m| m.destroy(true)}
-        self.metadata_cache.each do |name, value|
-          self.metadata.create({ :metadata_type => name, :value => value })
-        end if self.metadata_cache.is_a?(Hash)
+        if self.metadata_cache.is_a?(Hash)
+          self.metadata.each{|m| m.destroy(true)}
+          self.metadata_cache.each do |name, value|
+            self.metadata.create({ :metadata_type => name, :value => value })
+          end
+        end
       end
 
 			def load_metadata
