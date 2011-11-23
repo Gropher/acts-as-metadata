@@ -1,5 +1,5 @@
 module ActsAsMetadata
-  def acts_as_metadata(options)
+  def acts_as_metadata(options={})
     if options[:scope].is_a?(Symbol) && options[:scope].to_s !~ /_id$/
       scope = "#{options[:scope]}_id".to_sym
     else
@@ -59,12 +59,16 @@ module ActsAsMetadata
     	  end
   	  end
   	  
+  	  def scope
+  	    @@metadata_scope ? self.send(@@metadata_scope) : nil
+  	  end
+  	  
   	  def model_name
   	    self.class.name.underscore.to_sym
   	  end
       
       def metadata_types
-        MetadataType.model_types(model_name, self.send(@@metadata_scope))
+        MetadataType.model_types(model_name, scope)
       end
 
 			def self.metadata_types(scope=nil)
@@ -74,28 +78,28 @@ module ActsAsMetadata
       
       def get_metadata(name)
         load_metadata if !self.metadata_cache.is_a?(Hash)
-				self.metadata_cache[name]
+        type = MetadataType.type(name, scope)
+				self.metadata_cache[name] || type.default
       end
       
       def set_metadata(name, value)
-        type = MetadataType.type(name, self.send(@@metadata_scope))
+        type = MetadataType.type(name, scope)
         raise NoMethodError if type.nil?
         load_metadata if !self.metadata_cache.is_a?(Hash)
-        self.metadata_cache[name] = value ? value : type.default
+        self.metadata_cache[name] = value || type.default
       end
 
       def save_metadata
-        if self.metadata_cache.is_a?(Hash)
-          self.metadata.each{|m| m.destroy(true)}
-          self.metadata_cache.each do |name, value|
-            self.metadata.create({ :metadata_type => name, :value => value })
-          end
+        self.metadata.each{|m| m.destroy(true)}
+        self.metadata_types.each do |type_name|
+          value = self.get_metadata(type_name)
+          self.metadata.build(:metadata_type => type_name, :value => value) unless value.nil?
         end
       end
 
 			def load_metadata
 				self.metadata_cache = Hash[self.metadata.all.map { |m| [m.metadata_type, m.value] }]
-        self.save
+        self.save! if self.changed.include?(:metadata_cache)
 			end          
     end
   end

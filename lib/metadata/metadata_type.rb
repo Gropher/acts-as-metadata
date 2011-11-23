@@ -31,7 +31,7 @@ class MetadataType < ActiveRecord::Base
       :name => "Sample",
       :models => [:any],
       :mandatory => false,
-      :default => nil,
+      :default => 'default',
       :datatype => "string",
       :format => nil,
       :values => nil
