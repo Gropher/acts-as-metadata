@@ -60,7 +60,7 @@ module ActsAsMetadata
   	  end
   	  
       def metadata_scope
-        self.class.class_variable_get('@@metadata_scope') ? self.send(self.class.class_valiable_get('@@metadata_scope')) : nil
+        self.class.class_variable_get('@@metadata_scope') ? self.send(self.class.class_variable_get('@@metadata_scope')) : nil
       end
   	  
   	  def model_name
