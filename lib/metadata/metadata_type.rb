@@ -19,7 +19,7 @@ class MetadataType < ActiveRecord::Base
   attr_accessible  :tag, :name, :description, :models, :mandatory, 
     :default, :format, :datatype, :values, 
     :models_json, :values_json, :default_json
-  validates :tag, :presence => true, :format => {:with => /^[a-z]+$/},
+  validates :tag, :presence => true, :format => {:with => /^[a-z]+[a-z0-9]*$/},
     :exclusion => { :in => %w(format errors callback action categorie accept attributes host key layout notify open render save template type id parent_id lft rgt test),
      :message => "this name is reserved"}
   validates :datatype, :presence => true
