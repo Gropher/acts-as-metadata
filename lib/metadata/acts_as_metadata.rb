@@ -25,7 +25,7 @@ module ActsAsMetadata
       end
       
       def create_accessors
-       metadata_types.each do |type|
+        metadata_types.each do |type|
           class_eval "attr_accessor :#{type}"
           class_eval "def #{type}; get_metadata('#{type}'); end"
           class_eval "def #{type}=(value); set_metadata('#{type}', value); end"
@@ -59,12 +59,8 @@ module ActsAsMetadata
     	  end
   	  end
   	  
-  	  def self.metadata_scope
-  	    @@metadata_scope ? self.send(@@metadata_scope) : nil
-  	  end
-
       def metadata_scope
-        self.metadata_scope
+        self.class.class_valiable_get('@@metadata_scope') ? self.send(self.class.class_valiable_get('@@metadata_scope')) : nil
       end
   	  
   	  def model_name
