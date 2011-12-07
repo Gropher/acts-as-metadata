@@ -59,16 +59,20 @@ module ActsAsMetadata
     	  end
   	  end
   	  
-  	  def scope
+  	  def self.metadata_scope
   	    @@metadata_scope ? self.send(@@metadata_scope) : nil
   	  end
+
+      def metadata_scope
+        self.metadata_scope
+      end
   	  
   	  def model_name
   	    self.class.name.underscore.to_sym
   	  end
       
       def metadata_types
-        MetadataType.model_types(model_name, scope)
+        MetadataType.model_types(model_name, metadata_scope)
       end
 
 			def self.metadata_types(scope=nil)
@@ -78,12 +82,12 @@ module ActsAsMetadata
       
       def get_metadata(name)
         load_metadata if !self.metadata_cache.is_a?(Hash)
-        type = MetadataType.type(name, scope)
+        type = MetadataType.type(name, metadata_scope)
 				self.metadata_cache[name] || type.default
       end
       
       def set_metadata(name, value)
-        type = MetadataType.type(name, scope)
+        type = MetadataType.type(name, metadata_scope)
         raise NoMethodError if type.nil?
         load_metadata if !self.metadata_cache.is_a?(Hash)
         self.metadata_cache[name] = value || type.default
