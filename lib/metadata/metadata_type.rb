@@ -55,11 +55,11 @@ class MetadataType < ActiveRecord::Base
   end
 
 	def default_json
-    self.default.is_a?(String) ? self.default : self.default.to_json
+    self.default.to_json
   end
 
   def default_json=(value)
-    self.default = JSON.parse(value) rescue value
+    self.default = JSON.parse(value) rescue value[/"(.*)"/, 1]
   end
 
 
