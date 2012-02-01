@@ -90,6 +90,7 @@ module ActsAsMetadata
       end
 
       def save_metadata
+        touch
         self.metadata.each{|m| m.destroy(true)}
         self.metadata_types.each do |type_name|
           value = self.get_metadata(type_name)
