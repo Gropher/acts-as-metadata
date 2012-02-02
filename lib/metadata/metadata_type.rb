@@ -37,6 +37,20 @@ class MetadataType < ActiveRecord::Base
       :values => nil
     })
   end
+
+  def type_cast(value)
+    case datatype
+    when 'date'
+    when 'datetime'
+      DateTime.parse value
+    when 'number'
+      Integer value
+    when 'boolean'
+      ActiveRecord::ConnectionAdapters::Column.value_to_boolean value
+    else
+      value
+    end rescue default
+  end
  
 	def models_json
 		self.models ? self.models.to_json : [].to_json

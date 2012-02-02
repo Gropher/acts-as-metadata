@@ -79,7 +79,7 @@ module ActsAsMetadata
       def get_metadata(name)
         load_metadata if !self.metadata_cache.is_a?(Hash)
         type = MetadataType.type(name, metadata_scope)
-				self.metadata_cache[name] || type.default
+				type.type_cast(self.metadata_cache[name]) || type.default
       end
       
       def set_metadata(name, value)
