@@ -49,7 +49,7 @@ class MetadataType < ActiveRecord::Base
       ActiveRecord::ConnectionAdapters::Column.value_to_boolean value
     else
       value
-    end rescue default
+    end# rescue default
   end
  
 	def models_json
