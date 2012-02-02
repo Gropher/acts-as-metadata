@@ -40,7 +40,9 @@ class MetadataType < ActiveRecord::Base
 
   def type_cast(value)
     case datatype
-    when 'date', 'datetime'
+    when 'date' 
+      Date.parse value
+    when 'datetime'
       DateTime.parse value
     when 'number'
       Integer value
