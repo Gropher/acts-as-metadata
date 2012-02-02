@@ -40,8 +40,7 @@ class MetadataType < ActiveRecord::Base
 
   def type_cast(value)
     case datatype
-    when 'date'
-    when 'datetime'
+    when 'date', 'datetime'
       DateTime.parse value
     when 'number'
       Integer value
@@ -49,7 +48,7 @@ class MetadataType < ActiveRecord::Base
       ActiveRecord::ConnectionAdapters::Column.value_to_boolean value
     else
       value
-    end# rescue default
+    end rescue nil
   end
  
 	def models_json
