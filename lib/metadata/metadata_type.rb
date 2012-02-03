@@ -39,6 +39,7 @@ class MetadataType < ActiveRecord::Base
   end
 
   def type_cast(value)
+    return value unless value.is_a? String
     case datatype
     when 'date' 
       Date.parse value
