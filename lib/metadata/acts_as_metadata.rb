@@ -100,7 +100,6 @@ module ActsAsMetadata
 
 			def load_metadata
 				self.metadata_cache = Hash[self.metadata.all.map { |m| [m.metadata_type, m.value] }]
-        self.save!
 			end          
     end
   end
