@@ -69,4 +69,43 @@ describe ActsAsMetadata do
     MyModel.destroy_all
     Metadata::Metadata.all.count.should == 0
   end
+
+  it 'check presence validation' do
+    mt = MetadataType.first
+    mt.mandatory = true
+    mt.default = nil
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.save
+    mymodel.errors.include?(:sample).should == true
+    mymodel.sample = 'wqwewew'
+    mymodel.save
+    mymodel.errors.count.should == 0
+  end
+
+  it 'check format validation' do
+    mt = MetadataType.first
+    mt.format = '[a-z]'
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.sample = '12323'
+    mymodel.save
+    mymodel.errors.include?(:sample).should == true
+    mymodel.sample = 'wqwewew'
+    mymodel.save
+    mymodel.errors.count.should == 0
+  end
+
+  it 'check values validation' do
+    mt = MetadataType.first
+    mt.values = ['aaa', 'bbb']
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.sample = 'ccc'
+    mymodel.save
+    mymodel.errors.include?(:sample).should == true
+    mymodel.sample = 'bbb'
+    mymodel.save
+    mymodel.errors.count.should == 0
+  end
 end

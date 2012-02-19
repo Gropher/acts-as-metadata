@@ -13,6 +13,16 @@ module ActsAsMetadata
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
       before_create :create_accessors_and_save_metadata
       before_update :create_accessors_and_save_metadata
+      validate :metadata_constraints
+
+      def metadata_constraints
+        metadata_types.each do |type_name|
+          type = MetadataType.type(type_name, metadata_scope)
+          errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && get_metadata(type.tag).blank?
+          errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if !type.format.blank? && get_metadata(type.tag) !~ Regexp.new(type.format)
+          errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if !type.values.blank? && !type.values.include?(get_metadata(type.tag))
+        end
+      end
 
       
       def mass_assignment_authorizer
