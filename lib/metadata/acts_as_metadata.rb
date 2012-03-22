@@ -18,9 +18,11 @@ module ActsAsMetadata
       def metadata_constraints
         metadata_types.each do |type_name|
           type = MetadataType.type(type_name, metadata_scope)
-          errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && get_metadata(type.tag).blank?
-          errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if !type.format.blank? && !get_metadata(type.tag).blank? && get_metadata(type.tag) !~ Regexp.new(type.format)
-          errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if !type.values.blank? && !get_metadata(type.tag).blank? && !type.values.include?(get_metadata(type.tag))
+          value = get_metadata(type.tag)
+          values = type.values.map {|v| v.is_a?(Array) ? v[1] : v } rescue []
+          errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
+          errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if !type.format.blank? && !value.blank? && value !~ Regexp.new(type.format)
+          errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if !values.blank? && !value.blank? && !values.include?(value)
         end
       end
 
