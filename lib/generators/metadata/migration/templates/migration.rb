@@ -6,6 +6,7 @@ class CreateMetadata < ActiveRecord::Migration
       t.column :model_id, :integer
       t.column :model_type, :string
       t.column :value, :text
+      t.column :search_value, :string
       
       t.timestamp :deleted_at, :default => nil
       t.timestamps
@@ -30,6 +31,7 @@ class CreateMetadata < ActiveRecord::Migration
     add_index :metadata_types, :datatype
     add_index :metadata_types, :tag, :unique => true
     add_index :metadata, :metadata_type
+    add_index :metadata, [:metadata_type, :search_value]
     add_index :metadata, [:model_id, :model_type]
   end
   
