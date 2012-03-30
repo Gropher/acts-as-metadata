@@ -19,7 +19,7 @@ module Metadata
 
   protected
     def set_search_value
-      self.search_value = value[0,255]
+      self.search_value = value[0,255] rescue nil
     end
   end
 end
