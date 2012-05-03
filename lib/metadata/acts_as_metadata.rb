@@ -31,6 +31,15 @@ module ActsAsMetadata
         super + metadata_types
       end
       
+      def initialize(args=nil)
+        scope = self.class.class_variable_get('@@metadata_scope') ? args[self.class.class_variable_get('@@metadata_scope')] : nil
+        types = MetadataType.model_types(model_name, scope)
+        types.each do |type|
+          create_accessor type
+        end
+        super
+      end
+
       def update_attributes(attributes)
         create_accessors
         super
@@ -38,10 +47,14 @@ module ActsAsMetadata
       
       def create_accessors
         metadata_types.each do |type|
-          class_eval "attr_accessor :#{type}"
-          class_eval "def #{type}; get_metadata('#{type}'); end"
-          class_eval "def #{type}=(value); set_metadata('#{type}', value); end"
+          create_accessor type
         end 
+      end
+
+      def create_accessor type
+        class_eval "attr_accessor :#{type}"
+        class_eval "def #{type}; get_metadata('#{type}'); end"
+        class_eval "def #{type}=(value); set_metadata('#{type}', value); end"
       end
 
       def create_accessors_and_save_metadata
