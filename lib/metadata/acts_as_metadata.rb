@@ -32,7 +32,7 @@ module ActsAsMetadata
       end
       
       def initialize(args=nil)
-        scope = self.class.class_variable_get('@@metadata_scope') ? args[self.class.class_variable_get('@@metadata_scope')] : nil
+        scope = self.class.class_variable_get('@@metadata_scope') ? args[self.class.class_variable_get('@@metadata_scope')] : nil rescue nil
         types = MetadataType.model_types(model_name, scope)
         types.each do |type|
           create_accessor type
