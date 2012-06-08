@@ -1,0 +1,11 @@
+ActsAsMetadata
+==============
+
+User-generated metadata fields for your Rails models.
+
+Usage
+-----
+
+    class MyModel < ActiveRecord::Base
+      acts_as_metadata
+    end
