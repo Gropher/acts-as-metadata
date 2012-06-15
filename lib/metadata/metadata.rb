@@ -1,8 +1,7 @@
 module Metadata
   class Metadata < ActiveRecord::Base
     default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
-    before_create :set_search_value
-    before_update :set_search_value
+    before_save :set_search_value
 
     def undelete
       self.deleted_at=nil
@@ -20,7 +19,7 @@ module Metadata
 
   protected
     def set_search_value
-      self.search_value = value[0,255] rescue nil
+      self.search_value = value.to_s[0,255] rescue nil
     end
   end
 end
