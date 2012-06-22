@@ -115,8 +115,7 @@ module ActsAsMetadata
       end
 
       def save_metadata
-        touch
-        Metadata::Metadata.delete_all(:model_type => self.class.name, :model_id => self.id)
+        Metadata::Metadata.delete_all(:model_type => self.class.name, :model_id => self.id) unless self.id.blank?
         self.metadata_types.each do |type_name|
           value = self.get_metadata(type_name)
           self.metadata.build(:metadata_type => type_name, :value => value) unless value.nil?
