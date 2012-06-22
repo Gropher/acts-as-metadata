@@ -27,7 +27,7 @@ module ActsAsMetadata
       end
 
       
-      def mass_assignment_authorizer
+      def mass_assignment_authorizer(role = :default)
         super + metadata_types
       end
       
