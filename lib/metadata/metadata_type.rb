@@ -44,7 +44,7 @@ class MetadataType < ActiveRecord::Base
     when 'date' 
       Date.parse value
     when 'datetime'
-      DateTime.parse value
+      DateTime.parse(value).utc
     when 'number'
       Integer value
     when 'boolean'
