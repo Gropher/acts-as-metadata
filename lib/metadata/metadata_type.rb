@@ -42,9 +42,9 @@ class MetadataType < ActiveRecord::Base
     return value unless value.is_a? String
     case datatype
     when 'date' 
-      Date.parse value
+      ActiveRecord::ConnectionAdapters::Column.string_to_date value
     when 'datetime'
-      DateTime.parse(value).utc
+      ActiveRecord::ConnectionAdapters::Column.string_to_time value
     when 'number'
       Integer value
     when 'boolean'
