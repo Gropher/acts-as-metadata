@@ -39,6 +39,7 @@ class MetadataType < ActiveRecord::Base
   end
 
   def type_cast(value)
+    return nil if value.nil?
     return value unless value.is_a? String
     case datatype
     when 'date' 
@@ -78,6 +79,9 @@ class MetadataType < ActiveRecord::Base
     self.default = JSON.parse(value) rescue value[/"(.*)"/, 1]
   end
 
+  def default= value
+    attributes['default'] = type_cast value
+  end
 
   def self.scheme_data(scope=nil)
     Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_data", :expires_in => 60.minutes) do

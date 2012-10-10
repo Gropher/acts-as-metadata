@@ -97,21 +97,19 @@ module ActsAsMetadata
       end
 
 			def self.metadata_types(scope=nil)
-				types = MetadataType.model_types(self.name.underscore.to_sym, scope)
-        return types
+				MetadataType.model_types(self.name.underscore.to_sym, scope)
 			end
       
       def get_metadata(name)
-        load_metadata if !self.metadata_cache.is_a?(Hash)
-        type = MetadataType.type(name, metadata_scope)
-				type.type_cast(self.metadata_cache[name]) || type.type_cast(type.default)
+        load_metadata unless metadata_cache.is_a?(Hash)
+				metadata_cache[name] || MetadataType.type(name, metadata_scope).default
       end
       
       def set_metadata(name, value)
         type = MetadataType.type(name, metadata_scope)
         raise NoMethodError if type.nil?
-        load_metadata if !self.metadata_cache.is_a?(Hash)
-        self.metadata_cache[name] = type.type_cast(value) || type.type_cast(type.default)
+        load_metadata unless metadata_cache.is_a?(Hash)
+        self.metadata_cache[name] = type.type_cast(value) || type.default
       end
 
       def save_metadata
