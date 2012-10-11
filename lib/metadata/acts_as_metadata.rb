@@ -23,7 +23,11 @@ module ActsAsMetadata
           errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
           errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if !type.format.blank? && !value.blank? && value.to_s !~ Regexp.new("^#{type.format}$")
           errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if !values.blank? && !value.blank? && !values.include?(value)
-        end
+        end unless @skip_metadata_validation
+      end
+
+      def skip_metadata_validation!
+        @skip_metadata_validation = true
       end
 
       
