@@ -109,7 +109,7 @@ module ActsAsMetadata
         type = MetadataType.type(name, metadata_scope)
         raise NoMethodError if type.nil?
         load_metadata unless metadata_cache.is_a?(Hash)
-        self.metadata_cache[name] = type.type_cast(value) || type.default
+        self.metadata_cache[name] = type.type_cast(value) || type.type_cast(type.default)
       end
 
       def save_metadata
