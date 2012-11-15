@@ -2,7 +2,6 @@ module Metadata
   class Metadata < ActiveRecord::Base
     default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
     before_save :set_search_value
-    serialize :value
 
     def undelete
       self.deleted_at=nil

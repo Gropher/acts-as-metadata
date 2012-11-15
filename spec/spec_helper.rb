@@ -32,6 +32,7 @@ ActiveRecord::Base.connection.create_table(:metadata) do |t|
   t.integer  "model_id"
   t.string   "model_type"
   t.text     "value"
+  t.string   "search_value"
   t.datetime "deleted_at"
   t.datetime "created_at"
   t.datetime "updated_at"

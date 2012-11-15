@@ -21,8 +21,15 @@ module ActsAsMetadata
           value = get_metadata(type.tag)
           values = type.values.map {|v| v.is_a?(Array) ? v[1] : v } rescue []
           errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
-          errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if !type.format.blank? && !value.blank? && value.to_s !~ Regexp.new("^#{type.format}$")
-          errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if !values.blank? && !value.blank? && !values.include?(value)
+          if value.is_a? Array
+            value.each do |v|
+              errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && v.present? && v.to_s !~ Regexp.new("^#{type.format}$")
+              errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if values.present? && v.present? && !values.include?(v)
+            end
+          else
+            errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && value.present? && value.to_s !~ Regexp.new("^#{type.format}$")
+            errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if values.present? && value.present? && !values.include?(value)
+          end
         end unless @skip_metadata_validation
       end
 
@@ -120,15 +127,28 @@ module ActsAsMetadata
         Metadata::Metadata.delete_all(:model_type => self.class.name, :model_id => self.id) unless self.id.blank?
         self.metadata_types.each do |type_name|
           value = self.get_metadata(type_name)
-          self.metadata.build(:metadata_type => type_name, :value => value) unless value.nil?
+          if value.is_a? Array
+            value.each {|v| self.metadata.build(:metadata_type => type_name, :value => v) unless v.nil? }
+          else
+            self.metadata.build(:metadata_type => type_name, :value => value) unless value.nil?
+          end
         end
       end
 
 			def load_metadata
+        hash = {}
 				metadata.each do |m|
-          set_metadata m.metadata_type, m.value
+          if hash[m.metadata_type].nil?
+            hash[m.metadata_type] = m.value
+          elsif hash[m.metadata_type].is_a? Array
+             hash[m.metadata_type] << m.value
+          else
+             hash[m.metadata_type] = [hash[m.metadata_type], m.value]
+          end
         end
-			end          
+        self.metadata_cache = {}
+        metadata_types.each {|type_name| set_metadata type_name, hash[type_name] }
+      end
     end
   end
 end

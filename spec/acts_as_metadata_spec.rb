@@ -36,7 +36,7 @@ describe ActsAsMetadata do
     Metadata::Metadata.all.count.should == 0
   end
 
-  it 'check presence validation' do
+  it 'checks presence validation' do
     mt = MetadataType.first
     mt.mandatory = true
     mt.default = nil
@@ -49,10 +49,10 @@ describe ActsAsMetadata do
     mymodel.errors.count.should == 0
   end
 
-  it 'check format validation' do
+  it 'checks format validation' do
     mt = MetadataType.first
     mt.mandatory = false
-    mt.format = '[a-z]'
+    mt.format = '[a-z]*'
     mt.save!
     mymodel = MyModel.new
     mymodel.sample = '12323'
@@ -63,7 +63,7 @@ describe ActsAsMetadata do
     mymodel.errors.count.should == 0
   end
 
-  it 'check values validation' do
+  it 'checks values validation' do
     mt = MetadataType.first
     mt.values = ['aaa', 'bbb']
     mt.save!
@@ -75,4 +75,68 @@ describe ActsAsMetadata do
     mymodel.save
     mymodel.errors.count.should == 0
   end
+
+  it 'creates multiple metadata items for array metadata' do
+    MetadataType.destroy_all
+    mt = MetadataType.default
+    mt.tag = :samplearray
+    mt.name = "Sample Array"
+    mt.datatype = :array
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.samplearray = ['aaa', 'bbb', 'ccc']
+    mymodel.save
+    mymodel.errors.count.should == 0
+    mymodel.metadata.count.should == 3
+  end
+
+  it 'loads array metadata correctly' do
+    mymodel = MyModel.new
+    mymodel.samplearray = ['aaa', 'bbb', 'ccc']
+    mymodel.save
+    mymodel.errors.count.should == 0
+    mymodel.metadata_cache = nil
+    mymodel.samplearray.count.should == 3
+  end
+
+  it 'checks presence validation for array metadata' do
+    mt = MetadataType.first
+    mt.mandatory = true
+    mt.default = nil
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.save
+    mymodel.errors.include?(:samplearray).should == true
+    mymodel.samplearray = ['abc']
+    mymodel.save
+    mymodel.errors.count.should == 0
+  end
+
+  it 'checks format validation for array metadata' do
+    mt = MetadataType.first
+    mt.mandatory = false
+    mt.format = '[a-z]*'
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.samplearray = ['123', '456', 'ccc']
+    mymodel.save
+    mymodel.errors.count.should == 2
+    mymodel.samplearray = ['aaa', 'bbb', 'ccc']
+    mymodel.save
+    mymodel.errors.count.should == 0
+  end
+  
+  it 'checks values validation for array metadata' do
+    mt = MetadataType.first
+    mt.mandatory = false
+    mt.values = ['aaa', 'bbb', 'ccc']
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.samplearray = ['ddd', 'eee', 'ccc']
+    mymodel.save
+    mymodel.errors.count.should == 2
+    mymodel.samplearray = ['aaa', 'bbb', 'ccc']
+    mymodel.save
+    mymodel.errors.count.should == 0
+  end  
 end
