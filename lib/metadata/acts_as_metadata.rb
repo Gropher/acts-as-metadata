@@ -125,7 +125,9 @@ module ActsAsMetadata
       end
 
 			def load_metadata
-				self.metadata_cache = Hash[self.metadata.all.map { |m| [m.metadata_type, m.value] }]
+				metadata.each do |m|
+          set_metadata m.metadata_type, m.value
+        end
 			end          
     end
   end

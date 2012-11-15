@@ -6,7 +6,7 @@ class MetadataType < ActiveRecord::Base
     :datetime => "datetime",
     :number => "number",
     :boolean => "boolean",
-    :array => "array"
+    :hash => "hash"
   }
 
   serialize :default
