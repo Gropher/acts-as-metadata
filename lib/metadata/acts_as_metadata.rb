@@ -22,9 +22,9 @@ module ActsAsMetadata
           values = type.values.map {|v| v.is_a?(Array) ? v[1] : v } rescue []
           errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
           if value.is_a? Array
-            value.each do |v|
-              errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && v.present? && v.to_s !~ Regexp.new("^#{type.format}$")
-              errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if values.present? && v.present? && !values.include?(v)
+            value.each_with_index do |v, i|
+              errors.add("#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && v.present? && v.to_s !~ Regexp.new("^#{type.format}$")
+              errors.add("#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.values')) if values.present? && v.present? && !values.include?(v)
             end
           else
             errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && value.present? && value.to_s !~ Regexp.new("^#{type.format}$")
