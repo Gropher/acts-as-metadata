@@ -19,6 +19,7 @@ class CreateMetadata < ActiveRecord::Migration
       t.column :tag, :string
 			t.column :datatype, :string, :default => "string"
       t.column :mandatory, :boolean, :default => false
+      t.column :multiple, :boolean, :default => false
       t.column :format, :string
       t.column :values, :text
       t.column :models, :string, :default => '--- []'

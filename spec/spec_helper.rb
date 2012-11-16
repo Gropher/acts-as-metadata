@@ -43,6 +43,7 @@ ActiveRecord::Base.connection.create_table(:metadata_types) do |t|
   t.string   "tag"
   t.string   "datatype",    :default => "string"
   t.boolean  "mandatory",   :default => false
+  t.boolean  "multiple",   :default => false
   t.string   "format"
   t.text     "values"
   t.string   "models",      :default => "--- []"

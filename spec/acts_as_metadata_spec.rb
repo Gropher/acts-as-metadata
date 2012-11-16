@@ -76,12 +76,12 @@ describe ActsAsMetadata do
     mymodel.errors.count.should == 0
   end
 
-  it 'creates multiple metadata items for array metadata' do
+  it 'creates multiple metadata items' do
     MetadataType.destroy_all
     mt = MetadataType.default
     mt.tag = :samplearray
     mt.name = "Sample Array"
-    mt.datatype = :array
+    mt.multiple = true
     mt.save!
     mymodel = MyModel.new
     mymodel.samplearray = ['aaa', 'bbb', 'ccc']
@@ -90,7 +90,7 @@ describe ActsAsMetadata do
     mymodel.metadata.count.should == 3
   end
 
-  it 'loads array metadata correctly' do
+  it 'loads multiple metadata correctly' do
     mymodel = MyModel.new
     mymodel.samplearray = ['aaa', 'bbb', 'ccc']
     mymodel.save
@@ -99,7 +99,7 @@ describe ActsAsMetadata do
     mymodel.samplearray.count.should == 3
   end
 
-  it 'checks presence validation for array metadata' do
+  it 'checks presence validation for multiple metadata' do
     mt = MetadataType.first
     mt.mandatory = true
     mt.default = nil
@@ -112,7 +112,7 @@ describe ActsAsMetadata do
     mymodel.errors.count.should == 0
   end
 
-  it 'checks format validation for array metadata' do
+  it 'checks format validation for multiple metadata' do
     mt = MetadataType.first
     mt.mandatory = false
     mt.format = '[a-z]*'
@@ -126,7 +126,7 @@ describe ActsAsMetadata do
     mymodel.errors.count.should == 0
   end
   
-  it 'checks values validation for array metadata' do
+  it 'checks values validation for multiple metadata' do
     mt = MetadataType.first
     mt.mandatory = false
     mt.values = ['aaa', 'bbb', 'ccc']

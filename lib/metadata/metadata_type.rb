@@ -5,8 +5,7 @@ class MetadataType < ActiveRecord::Base
     :date => "date",
     :datetime => "datetime",
     :number => "number",
-    :boolean => "boolean",
-    :array => "array"
+    :boolean => "boolean"
   }
 
   serialize :default
@@ -17,7 +16,7 @@ class MetadataType < ActiveRecord::Base
   before_destroy :refresh_metadata
 	attr_accessor :models_json, :values_json, :default_json
   attr_accessible  :tag, :name, :description, :models, :mandatory, 
-    :default, :format, :datatype, :values, 
+    :default, :format, :datatype, :values, :multiple,
     :models_json, :values_json, :default_json
   validates :tag, :presence => true, :format => {:with => /^[a-z]+[a-z0-9]*$/},
     :exclusion => { :in => %w(format errors callback action categorie accept attributes host key layout notify open render save template type id parent_id lft rgt test select),
@@ -31,6 +30,7 @@ class MetadataType < ActiveRecord::Base
       :name => "Sample",
       :models => [:any],
       :mandatory => false,
+      :multiple => false,
       :default => 'default',
       :datatype => "string",
       :format => nil,
