@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Gropher"]
   s.email       = ["grophen@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/Gropher/acts-as-metadata"
   s.summary     = %q{Additional on-demand fields for ActiveRecord models}
   s.description = %q{This gem allows to add additional database-stored fields to your models}
 

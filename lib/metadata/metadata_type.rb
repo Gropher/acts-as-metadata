@@ -70,6 +70,7 @@ class MetadataType < ActiveRecord::Base
 
   def values_json=(value)
     self.values = JSON.parse(value) rescue []
+    values.each {|v| v.is_a?(Array) ? v.each(&:strip!) : v.strip! } if values.is_a? Array
   end
 
 	def default_json
