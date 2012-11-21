@@ -65,7 +65,8 @@ class MetadataType < ActiveRecord::Base
 	end 
 
   def values= value
-    self.values = value.is_a?(Hash) ? value.invert.to_a : value
+    value =  value.invert.to_a if value.is_a?(Hash)
+    super
   end
 
 	def values_json
