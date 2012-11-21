@@ -64,6 +64,10 @@ class MetadataType < ActiveRecord::Base
 		self.models = JSON.parse(value) rescue []
 	end 
 
+  def values= value
+    self.values = value.is_a?(Hash) ? value.invert.to_a : value
+  end
+
 	def values_json
     self.values ? self.values.to_a.to_json : [].to_json
   end
