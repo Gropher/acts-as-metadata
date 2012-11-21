@@ -65,7 +65,7 @@ class MetadataType < ActiveRecord::Base
 	end 
 
 	def values_json
-    self.values ? self.values.to_json : [].to_json
+    self.values ? self.values.to_a.to_json : [].to_json
   end
 
   def values_json=(value)
