@@ -40,7 +40,7 @@ class MetadataType < ActiveRecord::Base
   end
 
   def type_cast(value)
-    return nil if value.nil?
+    return nil if value.nil? && datatype != 'boolean'
     return value unless value.is_a? String
     case datatype
     when 'date' 
