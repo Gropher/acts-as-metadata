@@ -19,7 +19,7 @@ module ActsAsMetadata
         metadata_types.each do |type_name|
           type = MetadataType.type(type_name, metadata_scope)
           value = get_metadata(type.tag)
-          values = type.values.map {|v| v.is_a?(Array) ? v[1] : v } rescue []
+          values = type.values.map {|v| v.is_a?(Array) ? v[1].to_s : v.to_s } rescue []
           errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
           if value.is_a? Array
             value.each_with_index do |v, i|
@@ -28,7 +28,7 @@ module ActsAsMetadata
             end
           else
             errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && value.present? && value.to_s !~ Regexp.new("^#{type.format}$")
-            errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if values.present? && value.present? && !values.include?(value)
+            errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if values.present? && value.present? && !values.include?(value.to_s)
           end
         end unless @skip_metadata_validation
       end
