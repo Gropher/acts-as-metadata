@@ -40,8 +40,10 @@ class MetadataType < ActiveRecord::Base
   end
 
   def type_cast(value)
+    return value.map {|x| type_cast x } if value.is_a? Array
     return nil if value.nil? && datatype != 'boolean'
     return value unless value.is_a?(String) || value.nil?
+
     case datatype
     when 'date' 
       ActiveRecord::ConnectionAdapters::Column.string_to_date value

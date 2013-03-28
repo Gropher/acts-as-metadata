@@ -90,6 +90,21 @@ describe ActsAsMetadata do
     mymodel.metadata.count.should == 3
   end
 
+  it 'always returns array for multiple type' do
+    MetadataType.destroy_all
+    mt = MetadataType.default
+    mt.tag = :samplearray
+    mt.name = "Sample Array"
+    mt.multiple = true
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.samplearray = 'aaa'
+    mymodel.save
+    mymodel.errors.count.should == 0
+    mymodel.metadata.count.should == 1
+    mymodel.samplearray.should == ['aaa']
+  end
+
   it 'loads multiple metadata correctly' do
     mymodel = MyModel.new
     mymodel.samplearray = ['aaa', 'bbb', 'ccc']
