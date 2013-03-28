@@ -113,7 +113,7 @@ module ActsAsMetadata
       
       def get_metadata(name)
         load_metadata unless metadata_cache.is_a?(Hash)
-				metadata_cache[name]
+				metadata_cache[name].nil? ? MetadataType.type(name, metadata_scope).default : metadata_cache[name]
       end
       
       def set_metadata(name, value)
