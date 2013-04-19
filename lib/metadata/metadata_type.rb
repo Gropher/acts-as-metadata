@@ -80,6 +80,10 @@ class MetadataType < ActiveRecord::Base
     values.each {|v| v.is_a?(Array) ? v.each(&:strip!) : v.strip! } if values.is_a? Array
   end
 
+  def default
+    type_cast(attributes['default'])
+  end
+
 	def default_json
     self.default.to_json
   end
