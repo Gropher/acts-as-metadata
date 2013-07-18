@@ -154,4 +154,15 @@ describe ActsAsMetadata do
     mymodel.save
     mymodel.errors.count.should == 0
   end  
+
+  it 'removes blank values from multiple metadata' do
+    mt = MetadataType.first
+    mt.mandatory = false
+    mt.values = nil
+    mt.save!
+    mymodel = MyModel.new
+    mymodel.samplearray = ['aaa', 'bbb', '']
+    mymodel.save
+    mymodel.samplearray.count.should == 2
+  end
 end
