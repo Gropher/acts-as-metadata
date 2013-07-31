@@ -11,8 +11,7 @@ module ActsAsMetadata
 		class_eval do
       serialize :metadata_cache
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
-      before_create :create_accessors_and_save_metadata
-      before_update :create_accessors_and_save_metadata
+      before_save :create_accessors_and_save_metadata
       validate :metadata_constraints
 
       def metadata_constraints
@@ -121,7 +120,8 @@ module ActsAsMetadata
         type = MetadataType.type(name, metadata_scope)
         raise NoMethodError if type.nil?
         load_metadata unless metadata_cache.is_a?(Hash)
-        self.metadata_cache[name] = type.type_cast(value) || type.type_cast(type.default)
+        self.metadata_cache[name] = type.type_cast(value)
+        self.metadata_cache[name] = type.type_cast(type.default) if self.metadata_cache[name].blank?
         self.metadata_cache[name] = [self.metadata_cache[name]].compact if type.multiple && !self.metadata_cache[name].is_a?(Array)
         self.metadata_cache[name] = self.metadata_cache[name].first if !type.multiple && self.metadata_cache[name].is_a?(Array)
       end

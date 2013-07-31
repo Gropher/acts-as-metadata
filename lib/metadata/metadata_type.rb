@@ -20,7 +20,7 @@ class MetadataType < ActiveRecord::Base
     :default, :format, :datatype, :values, :multiple,
     :models_json, :values_json, :default_json
   validates :tag, :presence => true, :format => {:with => /^[a-z]+[a-z0-9_]*$/},
-    :exclusion => { :in => %w(format errors callback action categorie accept attributes host key layout notify open render save template type id parent_id lft rgt test select),
+    :exclusion => { :in => %w(format errors callback action categorie accept attributes host key layout notify open render save template type id parent_id lft rgt test select hash),
      :message => "this name is reserved"}
   validates :datatype, :presence => true
   default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
