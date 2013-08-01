@@ -103,27 +103,31 @@ module ActsAsMetadata
   	    self.class.name.underscore.to_sym
   	  end
       
+      def metadata_type name
+        MetadataType.type name, metadata_scope
+      end
+
       def metadata_types
         MetadataType.model_types(model_name, metadata_scope)
       end
 
-			def self.metadata_types(scope=nil)
+			def self.metadata_types scope=nil
 				MetadataType.model_types(self.name.underscore.to_sym, scope)
 			end
       
-      def get_metadata(name)
+      def get_metadata name
         load_metadata unless metadata_cache.is_a?(Hash)
-				metadata_cache[name].nil? ? MetadataType.type(name, metadata_scope).default : metadata_cache[name]
+        type = metadata_type name
+				metadata_cache[name].blank? ? type.type_cast(type.default) : metadata_cache[name]
       end
       
-      def set_metadata(name, value)
-        type = MetadataType.type(name, metadata_scope)
+      def set_metadata name, value
+        type = metadata_type name
         raise NoMethodError if type.nil?
         load_metadata unless metadata_cache.is_a?(Hash)
         self.metadata_cache[name] = type.type_cast(value)
-        self.metadata_cache[name] = type.type_cast(type.default) if self.metadata_cache[name].blank?
         self.metadata_cache[name] = [self.metadata_cache[name]].compact if type.multiple && !self.metadata_cache[name].is_a?(Array)
-        self.metadata_cache[name] = self.metadata_cache[name].first if !type.multiple && self.metadata_cache[name].is_a?(Array)
+        self.metadata_cache[name] = type.type_cast(self.metadata_cache[name].first) if !type.multiple && self.metadata_cache[name].is_a?(Array)
       end
 
       def save_metadata
