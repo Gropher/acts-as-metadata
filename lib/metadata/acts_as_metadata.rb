@@ -120,7 +120,8 @@ module ActsAsMetadata
         type = MetadataType.type(name, metadata_scope)
         raise NoMethodError if type.nil?
         load_metadata unless metadata_cache.is_a?(Hash)
-        self.metadata_cache[name] = type.type_cast(value) unless type.type_cast(value) == type.type_cast(type.default)
+        self.metadata_cache[name] = type.type_cast(value)
+        self.metadata_cache[name] = type.type_cast(type.default) if self.metadata_cache[name].blank?
         self.metadata_cache[name] = [self.metadata_cache[name]].compact if type.multiple && !self.metadata_cache[name].is_a?(Array)
         self.metadata_cache[name] = self.metadata_cache[name].first if !type.multiple && self.metadata_cache[name].is_a?(Array)
       end
