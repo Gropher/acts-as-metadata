@@ -12,23 +12,23 @@ describe ActsAsMetadata do
   
   it 'has default metadata value' do
     mymodel = MyModel.create
-    mymodel.sample.should == 'default'
+    mymodel.m_sample.should == 'default'
   end
 
   it 'set metadata value' do
     mymodel = MyModel.new
-    mymodel.sample = 'test'
+    mymodel.m_sample = 'test'
     mymodel.save!
     mymodel = MyModel.last
-    mymodel.sample.should == 'test'
+    mymodel.m_sample.should == 'test'
   end
   
   it 'updates metadata value' do
     mymodel = MyModel.last
-    mymodel.sample = 'test2'
+    mymodel.m_sample = 'test2'
     mymodel.save!
     mymodel = MyModel.last
-    mymodel.sample.should == 'test2'
+    mymodel.m_sample.should == 'test2'
   end
   
   it 'detete metadata when model deleted' do
@@ -43,8 +43,8 @@ describe ActsAsMetadata do
     mt.save!
     mymodel = MyModel.new
     mymodel.save
-    mymodel.errors.include?(:sample).should == true
-    mymodel.sample = 'wqwewew'
+    mymodel.errors.include?(:m_sample).should == true
+    mymodel.m_sample = 'wqwewew'
     mymodel.save
     mymodel.errors.count.should == 0
   end
@@ -55,10 +55,10 @@ describe ActsAsMetadata do
     mt.format = '[a-z]*'
     mt.save!
     mymodel = MyModel.new
-    mymodel.sample = '12323'
+    mymodel.m_sample = '12323'
     mymodel.save
-    mymodel.errors.include?(:sample).should == true
-    mymodel.sample = 'wqwewew'
+    mymodel.errors.include?(:m_sample).should == true
+    mymodel.m_sample = 'wqwewew'
     mymodel.save
     mymodel.errors.count.should == 0
   end
@@ -68,10 +68,10 @@ describe ActsAsMetadata do
     mt.values = ['aaa', 'bbb']
     mt.save!
     mymodel = MyModel.new
-    mymodel.sample = 'ccc'
+    mymodel.m_sample = 'ccc'
     mymodel.save
-    mymodel.errors.include?(:sample).should == true
-    mymodel.sample = 'bbb'
+    mymodel.errors.include?(:m_sample).should == true
+    mymodel.m_sample = 'bbb'
     mymodel.save
     mymodel.errors.count.should == 0
   end
@@ -84,7 +84,7 @@ describe ActsAsMetadata do
     mt.multiple = true
     mt.save!
     mymodel = MyModel.new
-    mymodel.samplearray = ['aaa', 'bbb', 'ccc']
+    mymodel.m_samplearray = ['aaa', 'bbb', 'ccc']
     mymodel.save
     mymodel.errors.count.should == 0
     mymodel.metadata.count.should == 3
@@ -98,20 +98,20 @@ describe ActsAsMetadata do
     mt.multiple = true
     mt.save!
     mymodel = MyModel.new
-    mymodel.samplearray = 'aaa'
+    mymodel.m_samplearray = 'aaa'
     mymodel.save
     mymodel.errors.count.should == 0
     mymodel.metadata.count.should == 1
-    mymodel.samplearray.should == ['aaa']
+    mymodel.m_samplearray.should == ['aaa']
   end
 
   it 'loads multiple metadata correctly' do
     mymodel = MyModel.new
-    mymodel.samplearray = ['aaa', 'bbb', 'ccc']
+    mymodel.m_samplearray = ['aaa', 'bbb', 'ccc']
     mymodel.save
     mymodel.errors.count.should == 0
     mymodel.metadata_cache = nil
-    mymodel.samplearray.count.should == 3
+    mymodel.m_samplearray.count.should == 3
   end
 
   it 'checks presence validation for multiple metadata' do
@@ -121,8 +121,8 @@ describe ActsAsMetadata do
     mt.save!
     mymodel = MyModel.new
     mymodel.save
-    mymodel.errors.include?(:samplearray).should == true
-    mymodel.samplearray = ['abc']
+    mymodel.errors.include?(:m_samplearray).should == true
+    mymodel.m_samplearray = ['abc']
     mymodel.save
     mymodel.errors.count.should == 0
   end
@@ -133,10 +133,10 @@ describe ActsAsMetadata do
     mt.format = '[a-z]*'
     mt.save!
     mymodel = MyModel.new
-    mymodel.samplearray = ['123', '456', 'ccc']
+    mymodel.m_samplearray = ['123', '456', 'ccc']
     mymodel.save
     mymodel.errors.count.should == 2
-    mymodel.samplearray = ['aaa', 'bbb', 'ccc']
+    mymodel.m_samplearray = ['aaa', 'bbb', 'ccc']
     mymodel.save
     mymodel.errors.count.should == 0
   end
@@ -147,10 +147,10 @@ describe ActsAsMetadata do
     mt.values = ['aaa', 'bbb', 'ccc']
     mt.save!
     mymodel = MyModel.new
-    mymodel.samplearray = ['ddd', 'eee', 'ccc']
+    mymodel.m_samplearray = ['ddd', 'eee', 'ccc']
     mymodel.save
     mymodel.errors.count.should == 2
-    mymodel.samplearray = ['aaa', 'bbb', 'ccc']
+    mymodel.m_samplearray = ['aaa', 'bbb', 'ccc']
     mymodel.save
     mymodel.errors.count.should == 0
   end  
@@ -161,8 +161,8 @@ describe ActsAsMetadata do
     mt.values = nil
     mt.save!
     mymodel = MyModel.new
-    mymodel.samplearray = ['aaa', 'bbb', '']
+    mymodel.m_samplearray = ['aaa', 'bbb', '']
     mymodel.save
-    mymodel.samplearray.count.should == 2
+    mymodel.m_samplearray.count.should == 2
   end
 end

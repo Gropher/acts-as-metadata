@@ -10,7 +10,7 @@ ActiveRecord::Base.establish_connection(
 	:database => "#{root}/db/acts_as_metadata.db"
 )
 ActionController::Base.cache_store = ActiveSupport::Cache::MemoryStore.new
-RAILS_CACHE = ActionController::Base.cache_store
+Rails.cache = ActionController::Base.cache_store
 
 RSpec.configure do |config|
   # some (optional) config here
@@ -20,7 +20,6 @@ ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS 'my_models'")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS 'metadata'")
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS 'metadata_types'")
 ActiveRecord::Base.connection.create_table(:my_models) do |t|
-  t.integer :id
   t.string :name
   t.text :description
   t.text :metadata_cache

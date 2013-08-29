@@ -15,15 +15,8 @@ class MetadataType < ActiveRecord::Base
   after_create :set_default_values
   after_update :refresh_metadata
   before_destroy :refresh_metadata
-	attr_accessor :models_json, :values_json, :default_json
-  attr_accessible  :tag, :name, :description, :models, :mandatory, 
-    :default, :format, :datatype, :values, :multiple,
-    :models_json, :values_json, :default_json
-  validates :tag, :presence => true, :format => {:with => /^[a-z]+[a-z0-9_]*$/},
-    :exclusion => { :in => %w(format errors callback action categorie accept attributes host key layout notify open render save template type id parent_id lft rgt test select hash),
-     :message => "this name is reserved"}
+  validates :tag, :presence => true, :format => {:with => /[a-z]+[a-z0-9_]*/}
   validates :datatype, :presence => true
-  default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
       
   def self.default
     self.new({
@@ -58,38 +51,13 @@ class MetadataType < ActiveRecord::Base
     end rescue nil
   end
  
-	def models_json
-		self.models ? self.models.to_json : [].to_json
-	end
-
-	def models_json=(value)
-		self.models = JSON.parse(value) rescue []
-	end 
-
   def values= value
     value =  value.invert.to_a if value.is_a?(Hash)
     super
   end
 
-	def values_json
-    self.values ? self.values.to_a.to_json : [].to_json
-  end
-
-  def values_json=(value)
-    self.values = JSON.parse(value) rescue []
-    values.each {|v| v.is_a?(Array) ? v.each(&:strip!) : v.strip! } if values.is_a? Array
-  end
-
   def default
     type_cast(attributes['default'])
-  end
-
-	def default_json
-    self.default.to_json
-  end
-
-  def default_json=(value)
-    self.default = JSON.parse(value) rescue value[/"(.*)"/, 1]
   end
 
   def self.scheme_data(scope=nil)

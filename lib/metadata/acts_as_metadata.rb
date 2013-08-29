@@ -1,17 +1,18 @@
 module ActsAsMetadata
-  def acts_as_metadata(options={})
+  def acts_as_metadata options={}
     if options[:scope].is_a?(Symbol) && options[:scope].to_s !~ /_id$/
       scope = "#{options[:scope]}_id".to_sym
     else
 		  scope = nil
 		end
 		
-		MetadataType.class_variable_set("@@metadata_scope", scope)
-		class_variable_set("@@metadata_scope", scope)
+		MetadataType.class_variable_set "@@metadata_scope", scope
+		class_variable_set "@@metadata_scope", scope
 		class_eval do
       serialize :metadata_cache
-      has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
-      before_save :create_accessors_and_save_metadata
+      has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata", autosave: true
+      after_initialize :create_accessors
+      before_save :save_metadata
       validate :metadata_constraints
 
       def metadata_constraints
@@ -22,13 +23,13 @@ module ActsAsMetadata
           if value.is_a? Array
             errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && (value.blank? || value.map(&:blank?).reduce(:&))
             value.each_with_index do |v, i|
-              errors.add("#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && v.present? && v.to_s !~ Regexp.new("^#{type.format}$")
-              errors.add("#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.values')) if values.present? && v.present? && !values.include?(v)
+              errors.add("m_#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && v.present? && v.to_s !~ Regexp.new("^#{type.format}$")
+              errors.add("m_#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.values')) if values.present? && v.present? && !values.include?(v)
             end
           else
-            errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
-            errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && value.present? && value.to_s !~ Regexp.new("^#{type.format}$")
-            errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if values.present? && value.present? && !values.include?(value.to_s)
+            errors.add("m_#{type.tag}", I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
+            errors.add("m_#{type.tag}", I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && value.present? && value.to_s !~ Regexp.new("^#{type.format}$")
+            errors.add("m_#{type.tag}", I18n.t('acts_as_metadata.errors.values')) if values.present? && value.present? && !values.include?(value.to_s)
           end
         end unless @skip_metadata_validation
       end
@@ -38,22 +39,8 @@ module ActsAsMetadata
       end
 
       
-      def mass_assignment_authorizer(role = :default)
-        super + metadata_types
-      end
-      
-      def initialize(args=nil, options = {})
-        scope = self.class.class_variable_get('@@metadata_scope') ? args[self.class.class_variable_get('@@metadata_scope')] : nil rescue nil
-        types = MetadataType.model_types(model_name, scope)
-        types.each do |type|
-          create_accessor type
-        end
-        super
-      end
-
-      def update_attributes(attributes)
-        create_accessors
-        super
+      def mass_assignment_authorizer role = :default
+        super + metadata_types.map {|t| "m_#{t}"}
       end
       
       def create_accessors
@@ -63,40 +50,13 @@ module ActsAsMetadata
       end
 
       def create_accessor type
-        class_eval "attr_accessor :#{type}"
-        class_eval "def #{type}; get_metadata('#{type}'); end"
-        class_eval "def #{type}=(value); set_metadata('#{type}', value); end"
+        class_eval "attr_accessor :m_#{type}"
+        class_eval "def m_#{type}; get_metadata('#{type}'); end"
+        class_eval "def m_#{type}=(value); set_metadata('#{type}', value); end"
       end
-
-      def create_accessors_and_save_metadata
-        create_accessors
-        save_metadata
-      end
-      
-      def method_missing(meth, *args, &block)
-        begin
-          super
-        rescue NoMethodError
-          name = meth.to_s
-    	    if name =~ /^(.+)=$/
-    	      name = name[0..-2]
-    	      if metadata_types.include?(name)
-    	        set_metadata(name, args.first)
-    	      else
-    	        raise
-    	      end
-    	    else
-    	      if metadata_types.include?(name)
-    	        get_metadata(name)
-    	      else
-    	        raise
-    	      end
-    	    end
-    	  end
-  	  end
   	  
       def metadata_scope
-        self.class.class_variable_get('@@metadata_scope') ? self.send(self.class.class_variable_get('@@metadata_scope')) : nil
+        self.class.class_variable_get('@@metadata_scope') ? send(self.class.class_variable_get('@@metadata_scope')) : nil
       end
   	  
   	  def model_name
@@ -108,15 +68,15 @@ module ActsAsMetadata
       end
 
       def metadata_types
-        MetadataType.model_types(model_name, metadata_scope)
+        MetadataType.model_types model_name, metadata_scope
       end
 
 			def self.metadata_types scope=nil
-				MetadataType.model_types(self.name.underscore.to_sym, scope)
+				MetadataType.model_types name.underscore.to_sym, scope
 			end
       
       def get_metadata name
-        load_metadata unless metadata_cache.is_a?(Hash)
+        load_metadata unless metadata_cache.is_a? Hash
         type = metadata_type name
 				metadata_cache[name].blank? ? type.type_cast(type.default) : metadata_cache[name]
       end
@@ -124,20 +84,20 @@ module ActsAsMetadata
       def set_metadata name, value
         type = metadata_type name
         raise NoMethodError if type.nil?
-        load_metadata unless metadata_cache.is_a?(Hash)
-        self.metadata_cache[name] = type.type_cast(value)
-        self.metadata_cache[name] = [self.metadata_cache[name]].compact if type.multiple && !self.metadata_cache[name].is_a?(Array)
-        self.metadata_cache[name] = type.type_cast(self.metadata_cache[name].first) if !type.multiple && self.metadata_cache[name].is_a?(Array)
+        load_metadata unless metadata_cache.is_a? Hash
+        metadata_cache[name] = type.type_cast(value)
+        metadata_cache[name] = [metadata_cache[name]].compact if type.multiple && !metadata_cache[name].is_a?(Array)
+        metadata_cache[name] = type.type_cast(metadata_cache[name].first) if !type.multiple && metadata_cache[name].is_a?(Array)
       end
 
       def save_metadata
-        Metadata::Metadata.delete_all(:model_type => self.class.name, :model_id => self.id) unless self.id.blank?
-        self.metadata_types.each do |type_name|
-          value = self.get_metadata(type_name)
+        metadata.map &:mark_for_destruction
+        metadata_types.each do |type_name|
+          value = get_metadata(type_name)
           if value.is_a? Array
-            value.each {|v| self.metadata.build(:metadata_type => type_name, :value => v) unless v.nil? }
+            value.each {|v| metadata.build(metadata_type: type_name, value: v) unless v.nil? }
           else
-            self.metadata.build(:metadata_type => type_name, :value => value) unless value.nil?
+            metadata.build(metadata_type: type_name, value: value) unless value.nil?
           end
         end
       end
