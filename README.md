@@ -39,7 +39,7 @@ Create metadata types in your database:
 Its ready to use:
 
     m = MyModel.new
-    m.sample = 'some string'
+    m.m_sample = 'some string'
     m.save!
 
 Add some validations or default value if you need:
