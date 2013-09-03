@@ -1,13 +1,11 @@
 module ActsAsMetadata
   def acts_as_metadata options={}
     if options[:scope].is_a?(Symbol) && options[:scope].to_s !~ /_id$/
-      scope = "#{options[:scope]}_id".to_sym
+      @metadata_scope = "#{options[:scope]}_id".to_sym
     else
-		  scope = nil
+		  @metadata_scope = nil
 		end
-		
-		MetadataType.class_variable_set "@@metadata_scope", scope
-		class_variable_set "@@metadata_scope", scope
+	  	
 		class_eval do
       serialize :metadata_cache
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata", autosave: true
@@ -17,7 +15,7 @@ module ActsAsMetadata
 
       def metadata_constraints
         metadata_types.each do |type_name|
-          type = MetadataType.type(type_name, metadata_scope)
+          type = metadata_type type_name
           value = get_metadata(type.tag)
           values = type.values.map {|v| v.is_a?(Array) ? v[1].to_s : v.to_s } rescue []
           if value.is_a? Array
@@ -37,7 +35,6 @@ module ActsAsMetadata
       def skip_metadata_validation!
         @skip_metadata_validation = true
       end
-
       
       def mass_assignment_authorizer role = :default
         super + metadata_types.map {|t| "m_#{t}"}
@@ -56,25 +53,54 @@ module ActsAsMetadata
       end
   	  
       def metadata_scope
-        self.class.class_variable_get('@@metadata_scope') ? send(self.class.class_variable_get('@@metadata_scope')) : nil
+        self.class.metadata_scope
       end
   	  
-  	  def model_name
-  	    self.class.name.underscore.to_sym
-  	  end
-      
+      def self.metadata_scope
+        @metadata_scope
+      end
+  	  
       def metadata_type name
-        MetadataType.type name, metadata_scope
+        self.class.metadata_scheme(metadata_scope)[name]
       end
 
       def metadata_types
-        MetadataType.model_types model_name, metadata_scope
+        self.class.metadata_types metadata_scope
       end
 
 			def self.metadata_types scope=nil
-				MetadataType.model_types name.underscore.to_sym, scope
+        model = name.underscore.to_sym
+        types = Rails.cache.fetch("metadata_scheme_#{metadata_scope}#{scope}_modeltypes", expires_in: 60.minutes) do
+           res = { :any => [] }
+           metadata_scheme(scope).each do |tag, type|
+             type.models.each do |model| 
+               res[model] = [] if res[model].blank?
+               res[model] << tag
+             end if type.models
+           end
+           res
+        end
+        types[model] ? (types[model] | types[:any]).uniq : types[:any]
 			end
+       
+      def self.metadata_scheme_data(scope=nil)
+        Rails.cache.fetch("metadata_scheme_#{metadata_scope}#{scope}_data", expires_in: 60.minutes) do
+          uncached do
+            scope.blank? ? MetadataType.all : MetadataType.where(metadata_scope => scope)
+          end
+        end
+      end
       
+      def self.metadata_scheme(scope=nil)
+        Rails.cache.fetch("metadata_scheme_#{metadata_scope}#{scope}_types", expires_in: 60.minutes) do
+          res = {}
+          metadata_scheme_data(scope).each do |type|
+            res[type.tag] = type
+          end
+          res
+        end
+      end
+
       def get_metadata name
         load_metadata unless metadata_cache.is_a? Hash
         type = metadata_type name

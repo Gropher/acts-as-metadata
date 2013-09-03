@@ -12,7 +12,8 @@ class MetadataType < ActiveRecord::Base
   serialize :default
   serialize :values
   serialize :models
-  after_create :set_default_values
+  before_save :set_correct_values
+  after_create :refresh_metadata
   after_update :refresh_metadata
   before_destroy :refresh_metadata
   validates :tag, :presence => true, :format => {:with => /[a-z]+[a-z0-9_]*/}
@@ -52,78 +53,33 @@ class MetadataType < ActiveRecord::Base
   end
  
   def values= value
-    value =  value.invert.to_a if value.is_a?(Hash)
+    value = value.invert.to_a if value.is_a?(Hash)
     super
-  end
-
-  def default
-    type_cast(attributes['default'])
-  end
-
-  def self.scheme_data(scope=nil)
-    Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_data", :expires_in => 60.minutes) do
-		  uncached do
-        scheme_data = scope.blank? ? self.all : self.where(@@metadata_scope => scope).all
-        if scheme_data.count > 0
-          scheme_data
-        else
-          []
-        end
-      end
-		end
-  end
-  
-  def self.scheme(scope=nil)
-    Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_types", :expires_in => 60.minutes) do
-      res = {}
-      self.scheme_data(scope).each do |type|
-        res[type.tag] = type
-      end
-      res
-    end
-  end
-  
-  def self.model_types(model, scope=nil)
-    types = Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
-       res = { :any => [] }
-       self.scheme(scope).each do |tag, type|
-         type.models.each do |model| 
-      	   res[model] = [] if res[model].blank?
-      	   res[model] << tag
-     	   end if type.models
-     	 end
-     	 res
-    end
-    types[model] ? (types[model] | types[:any]).uniq : types[:any]
-  end
-  
-  def self.type(name, scope=nil)
-    self.scheme(scope)[name]
-  end
- 
-  def self.drop_cache(scope=nil)
-    Rails.cache.delete("metadata_scheme_#{@@metadata_scope}#{scope}_data")
-    Rails.cache.delete("metadata_scheme_#{@@metadata_scope}#{scope}_types")
-    Rails.cache.delete("metadata_scheme_#{@@metadata_scope}#{scope}_modeltypes")
   end
  
 private 
-  def set_default_values
-		self.models = [] if self.models.nil?
-		self.values = [] if self.values.nil?
-		self.save
-		if @@metadata_scope
-		  MetadataType.drop_cache(self.send(@@metadata_scope))
-		else
-		  MetadataType.drop_cache
-		end  
-	end 
+  def drop_metadata_scheme_cache scope_column=nil, scope_value=nil
+    Rails.cache.delete("metadata_scheme_#{scope_column}#{scope_value}_data")
+    Rails.cache.delete("metadata_scheme_#{scope_column}#{scope_value}_types")
+    Rails.cache.delete("metadata_scheme_#{scope_column}#{scope_value}_modeltypes")
+  end
+
+  def set_correct_values
+		self.models = (models || []).map(&:to_sym).uniq.keep_if {|model| Kernel.const_defined?(model.capitalize) || model == :any }
+		self.values = (values || []).uniq
+    self.default = type_cast default
+  end 
 
   def refresh_metadata
-    if @@metadata_scope
-      MetadataType.drop_cache(self.send(@@metadata_scope))
-    else
-      MetadataType.drop_cache
+    drop_metadata_scheme_cache
+    model_classes = models.include?(:any) ? ObjectSpace.each_object(Class).select {|klass| klass < ActiveRecord::Base } : models.map {|model| Kernel.const_get model }
+    scope_columns = []
+    model_classes.each do |model|
+      model
+      scope_columns << model.metadata_scope if model.respond_to? :metadata_scope
+    end
+    scope_columns.uniq.compact.each do |scope_column|
+      drop_metadata_scheme_cache scope_column, send(scope_column)
     end
   end
 end

@@ -7,7 +7,8 @@ end
 describe ActsAsMetadata do
   it 'creates metadata_type' do
     MetadataType.default.save!
-    MetadataType.scheme_data.count.should == 1
+    MyModel.metadata_scheme_data.count.should == 1
+    MyModel.new.metadata_types.count.should == 1
   end
   
   it 'has default metadata value' do
