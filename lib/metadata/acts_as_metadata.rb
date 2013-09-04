@@ -86,7 +86,7 @@ module ActsAsMetadata
       def self.metadata_scheme_data(scope=nil)
         Rails.cache.fetch("metadata_scheme_#{metadata_scope}#{scope}_data", expires_in: 60.minutes) do
           uncached do
-            scope.blank? ? MetadataType.all : MetadataType.where(metadata_scope => scope)
+            scope.blank? ? MetadataType.all : MetadataType.where(metadata_scope => scope).all
           end
         end
       end
