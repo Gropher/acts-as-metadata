@@ -104,7 +104,7 @@ module ActsAsMetadata
       def get_metadata name
         load_metadata unless metadata_cache.is_a? Hash
         type = metadata_type name
-				metadata_cache[name].blank? ? type.type_cast(type.default) : metadata_cache[name]
+				metadata_cache[name].blank? ? type.type_cast(type.default_value) : metadata_cache[name]
       end
       
       def set_metadata name, value
