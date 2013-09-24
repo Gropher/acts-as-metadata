@@ -16,7 +16,7 @@ class MetadataType < ActiveRecord::Base
   after_create :refresh_metadata
   after_update :refresh_metadata
   before_destroy :refresh_metadata
-  validates :tag, :presence => true, :format => {:with => /[a-z]+[a-z0-9_]*/}
+  validates :tag, :presence => true, :format => {:with => /([a-z])+([a-z0-9_])*/}
   validates :datatype, :presence => true
       
   def self.default
