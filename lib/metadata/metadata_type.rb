@@ -5,7 +5,7 @@ class MetadataType < ActiveRecord::Base
     :date => "date",
     :datetime => "datetime",
     :number => "number",
-    :boolean => "boolean",
+    :logical => "logical",
     :array => 'array'
   }
 
@@ -17,7 +17,7 @@ class MetadataType < ActiveRecord::Base
   after_update :refresh_metadata
   before_destroy :refresh_metadata
   validates :tag, :presence => true, :format => {:with => /\A[a-z]+[a-z0-9_]*\Z/}
-  validates :datatype, :presence => true
+  validates :datatype, :presence => true, :inclusion => { :in => DATATYPES.values }
       
   def self.default
     self.new({
@@ -35,7 +35,7 @@ class MetadataType < ActiveRecord::Base
 
   def type_cast(value)
     return value.delete_if(&:blank?).map {|x| type_cast x } if value.is_a? Array
-    return nil if value.nil? && datatype != 'boolean'
+    return nil if value.nil? && datatype != 'logical'
     return value unless value.is_a?(String) || value.nil?
 
     case datatype
@@ -45,7 +45,7 @@ class MetadataType < ActiveRecord::Base
       ActiveRecord::ConnectionAdapters::Column.string_to_time value
     when 'number'
       Integer value
-    when 'boolean'
+    when 'logical'
       ActiveRecord::ConnectionAdapters::Column.value_to_boolean value
     else
       value
