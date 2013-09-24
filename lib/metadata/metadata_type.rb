@@ -5,7 +5,7 @@ class MetadataType < ActiveRecord::Base
     :date => "date",
     :datetime => "datetime",
     :number => "number",
-    :logical => "logical",
+    :boolean => "boolean",
     :array => 'array'
   }
 
@@ -34,7 +34,7 @@ class MetadataType < ActiveRecord::Base
 
   def type_cast(value)
     return value.delete_if(&:blank?).map {|x| type_cast x } if value.is_a? Array
-    return nil if value.nil? && datatype != 'logical'
+    return nil if value.nil? && datatype != 'boolean'
     return value unless value.is_a?(String) || value.nil?
 
     case datatype
@@ -66,7 +66,7 @@ private
   def set_correct_values
 		self.models = (models || []).map(&:to_sym).uniq.keep_if {|model| Kernel.const_defined?(model.capitalize) || model == :any }
 		self.values = (values || []).uniq
-    self.default = type_cast default
+    #self.default = type_cast default
   end 
 
   def refresh_metadata
