@@ -18,14 +18,14 @@ class MetadataType < ActiveRecord::Base
   validates :tag, :presence => true, :format => {:with => /\A[a-z]+[a-z0-9_]*\Z/}
   validates :datatype, :presence => true, :inclusion => { :in => DATATYPES.values }
       
-  def self.sample_type
+  def self.default
     self.new({
       :tag => :sample,
       :name => "Sample",
       :models => [:any],
       :mandatory => false,
       :multiple => false,
-      :default_value => 'default',
+      :default => 'default',
       :datatype => "string",
       :format => nil,
       :values => nil
@@ -66,7 +66,7 @@ private
   def set_correct_values
 		self.models = (models || []).map(&:to_sym).uniq.keep_if {|model| Kernel.const_defined?(model.capitalize) || model == :any }
 		self.values = (values || []).uniq
-    self.default_value = type_cast default_value
+    self.default = type_cast default
   end 
 
   def refresh_metadata

@@ -46,7 +46,7 @@ ActiveRecord::Base.connection.create_table(:metadata_types) do |t|
   t.string   "format"
   t.text     "values"
   t.string   "models",      :default => "--- []"
-  t.text     "default_value"
+  t.text     "default"
   t.datetime "deleted_at"
   t.datetime "created_at"
   t.datetime "updated_at"

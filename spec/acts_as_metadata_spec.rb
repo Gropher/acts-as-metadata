@@ -6,7 +6,7 @@ end
 
 describe ActsAsMetadata do
   it 'creates metadata_type' do
-    MetadataType.sample_type.save!
+    MetadataType.default.save!
     MyModel.metadata_scheme_data.count.should == 1
     MyModel.new.metadata_types.count.should == 1
   end
@@ -40,7 +40,7 @@ describe ActsAsMetadata do
   it 'checks presence validation' do
     mt = MetadataType.first
     mt.mandatory = true
-    mt.default_value = nil
+    mt.default = nil
     mt.save!
     mymodel = MyModel.new
     mymodel.save
@@ -79,7 +79,7 @@ describe ActsAsMetadata do
 
   it 'creates multiple metadata items' do
     MetadataType.destroy_all
-    mt = MetadataType.sample_type
+    mt = MetadataType.default
     mt.tag = :samplearray
     mt.name = "Sample Array"
     mt.multiple = true
@@ -93,7 +93,7 @@ describe ActsAsMetadata do
 
   it 'always returns array for multiple type' do
     MetadataType.destroy_all
-    mt = MetadataType.sample_type
+    mt = MetadataType.default
     mt.tag = :samplearray
     mt.name = "Sample Array"
     mt.multiple = true
@@ -118,7 +118,7 @@ describe ActsAsMetadata do
   it 'checks presence validation for multiple metadata' do
     mt = MetadataType.first
     mt.mandatory = true
-    mt.default_value = nil
+    mt.default = nil
     mt.save!
     mymodel = MyModel.new
     mymodel.save

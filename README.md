@@ -42,9 +42,9 @@ Its ready to use:
     m.m_sample = 'some string'
     m.save!
 
-Add some validations or default value if needed:
+Add some validations or default value if you need:
 
-    mt.default_value   = 'some default string' 
+    mt.default   = 'some default string' 
     mt.mandatory = true                   # presence validation
     mt.format    = "[a-z]*"               # regexp validation
     mt.values    = ['aaa', 'bbb', 'ccc']  # inclusion validation
