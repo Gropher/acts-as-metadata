@@ -66,7 +66,7 @@ private
   def set_correct_values
 		self.models = (models || []).map(&:to_sym).uniq.keep_if {|model| Kernel.const_defined?(model.capitalize) || model == :any }
 		self.values = (values || []).uniq
-    #self.default = type_cast default
+    self.default = type_cast(default).to_s
   end 
 
   def refresh_metadata
