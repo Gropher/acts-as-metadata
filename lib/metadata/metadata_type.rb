@@ -71,7 +71,7 @@ private
 
   def refresh_metadata
     drop_metadata_scheme_cache
-    model_classes = models.include?(:any) ? ObjectSpace.each_object(Class).select {|klass| klass < ActiveRecord::Base } : models.map {|model| Kernel.const_get model }
+    model_classes = models.include?(:any) ? ObjectSpace.each_object(Class).select {|klass| klass < ActiveRecord::Base } : models.map {|model| Kernel.const_get model.capitalize }
     scope_columns = []
     model_classes.each do |model|
       model
