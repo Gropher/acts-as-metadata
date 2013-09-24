@@ -9,7 +9,6 @@ class MetadataType < ActiveRecord::Base
     :array => 'array'
   }
 
-  serialize :default
   serialize :values
   serialize :models
   before_save :set_correct_values
