@@ -55,17 +55,21 @@ module ActsAsMetadata
       def metadata_scope
         self.class.metadata_scope
       end
+
+      def metadata_scope_value
+        metadata_scope.present? ? send(metadata_scope) : nil
+      end
   	  
       def self.metadata_scope
         @metadata_scope
       end
   	  
       def metadata_type name
-        self.class.metadata_scheme(metadata_scope)[name]
+        self.class.metadata_scheme(metadata_scope_value)[name]
       end
 
       def metadata_types
-        self.class.metadata_types metadata_scope
+        self.class.metadata_types metadata_scope_value
       end
 
 			def self.metadata_types scope=nil
