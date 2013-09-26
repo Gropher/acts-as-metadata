@@ -46,7 +46,7 @@ Add some validations or default value if you need:
 
     mt.default   = 'some default string' 
     mt.mandatory = true                   # presence validation
-    mt.format    = "[a-z]*"               # regexp validation
+    mt.regexp    = "[a-z]*"               # regexp validation
     mt.values    = ['aaa', 'bbb', 'ccc']  # inclusion validation
     mt.save!
 

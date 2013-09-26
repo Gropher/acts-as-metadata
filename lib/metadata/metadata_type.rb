@@ -27,7 +27,7 @@ class MetadataType < ActiveRecord::Base
       :multiple => false,
       :default => 'default',
       :datatype => "string",
-      :format => nil,
+      :regexp => nil,
       :values => nil
     })
   end

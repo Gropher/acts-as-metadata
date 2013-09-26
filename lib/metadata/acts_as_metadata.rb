@@ -21,12 +21,12 @@ module ActsAsMetadata
           if value.is_a? Array
             errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && (value.blank? || value.map(&:blank?).reduce(:&))
             value.each_with_index do |v, i|
-              errors.add("m_#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && v.present? && v.to_s !~ Regexp.new("^#{type.format}$")
+              errors.add("m_#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.regexp')) if values.blank? && type.regexp.present? && v.present? && v.to_s !~ Regexp.new(type.regexp)
               errors.add("m_#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.values')) if values.present? && v.present? && !values.include?(v)
             end
           else
             errors.add("m_#{type.tag}", I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
-            errors.add("m_#{type.tag}", I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && value.present? && value.to_s !~ Regexp.new("^#{type.format}$")
+            errors.add("m_#{type.tag}", I18n.t('acts_as_metadata.errors.regexp')) if values.blank? && type.regexp.present? && value.present? && value.to_s !~ Regexp.new(type.regexp)
             errors.add("m_#{type.tag}", I18n.t('acts_as_metadata.errors.values')) if values.present? && value.present? && !values.include?(value.to_s)
           end
         end unless @skip_metadata_validation

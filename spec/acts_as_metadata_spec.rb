@@ -50,10 +50,10 @@ describe ActsAsMetadata do
     mymodel.errors.count.should == 0
   end
 
-  it 'checks format validation' do
+  it 'checks regexp validation' do
     mt = MetadataType.first
     mt.mandatory = false
-    mt.format = '[a-z]*'
+    mt.regexp = '\A[a-z]*\Z'
     mt.save!
     mymodel = MyModel.new
     mymodel.m_sample = '12323'
@@ -128,10 +128,10 @@ describe ActsAsMetadata do
     mymodel.errors.count.should == 0
   end
 
-  it 'checks format validation for multiple metadata' do
+  it 'checks regexp validation for multiple metadata' do
     mt = MetadataType.first
     mt.mandatory = false
-    mt.format = '[a-z]*'
+    mt.regexp = '\A[a-z]*\Z'
     mt.save!
     mymodel = MyModel.new
     mymodel.m_samplearray = ['123', '456', 'ccc']
