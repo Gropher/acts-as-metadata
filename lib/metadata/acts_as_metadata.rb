@@ -36,10 +36,6 @@ module ActsAsMetadata
         @skip_metadata_validation = true
       end
       
-      def mass_assignment_authorizer role = :default
-        super + metadata_types.map {|t| "m_#{t}"}
-      end
-      
       def create_accessors
         metadata_types.each do |type|
           create_accessor type
