@@ -19,7 +19,7 @@ module ActsAsMetadata
           value = get_metadata(type.tag)
           values = type.values.map {|v| v.is_a?(Array) ? v[1].to_s : v.to_s } rescue []
           if value.is_a? Array
-            errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && (value.blank? || value.map(&:blank?).reduce(:&))
+            errors.add("m_#{type.tag}", I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && (value.blank? || value.map(&:blank?).reduce(:&))
             value.each_with_index do |v, i|
               errors.add("m_#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.regexp')) if values.blank? && type.regexp.present? && v.present? && v.to_s !~ Regexp.new(type.regexp)
               errors.add("m_#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.values')) if values.present? && v.present? && !values.include?(v)
