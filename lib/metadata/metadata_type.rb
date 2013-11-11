@@ -44,7 +44,7 @@ class MetadataType < ActiveRecord::Base
       ActiveRecord::ConnectionAdapters::Column.string_to_time value
     when 'number'
       Integer value
-    when 'logical'
+    when 'boolean'
       ActiveRecord::ConnectionAdapters::Column.value_to_boolean value
     else
       value
