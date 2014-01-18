@@ -9,7 +9,7 @@ module ActsAsMetadata
 		MetadataType.class_variable_set("@@metadata_scope", scope)
 		class_variable_set("@@metadata_scope", scope)
 		class_eval do
-      serialize :metadata_cache
+      serialize :metadata_cache, JSON
       has_many :metadata, :as => :model, :dependent => :destroy, :class_name => "Metadata::Metadata"
       before_save :create_accessors_and_save_metadata
       validate :metadata_constraints

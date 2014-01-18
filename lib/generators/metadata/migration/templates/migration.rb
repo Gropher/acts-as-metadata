@@ -22,7 +22,7 @@ class CreateMetadata < ActiveRecord::Migration
       t.column :multiple, :boolean, :default => false
       t.column :format, :string
       t.column :values, :text
-      t.column :models, :string, :default => '--- []'
+      t.column :models, :string, :default => [].to_json
       t.column :default, :text     
  
       t.timestamp :deleted_at, :default => nil

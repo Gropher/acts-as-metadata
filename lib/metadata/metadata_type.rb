@@ -9,9 +9,9 @@ class MetadataType < ActiveRecord::Base
     :array => 'array'
   }
 
-  serialize :default
-  serialize :values
-  serialize :models
+  serialize :default, JSON
+  serialize :values, JSON
+  serialize :models, JSON
   after_create :set_default_values
   after_update :refresh_metadata
   before_destroy :refresh_metadata
