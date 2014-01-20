@@ -100,7 +100,7 @@ module ActsAsMetadata
       end
   	  
   	  def model_name
-  	    self.class.name.underscore.to_sym
+  	    self.class.name.underscore.to_s
   	  end
       
       def metadata_type name
@@ -112,7 +112,7 @@ module ActsAsMetadata
       end
 
 			def self.metadata_types scope=nil
-				MetadataType.model_types(self.name.underscore.to_sym, scope)
+				MetadataType.model_types(self.name.underscore.to_s, scope)
 			end
       
       def get_metadata name

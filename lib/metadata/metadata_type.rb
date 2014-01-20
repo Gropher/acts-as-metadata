@@ -29,7 +29,7 @@ class MetadataType < ActiveRecord::Base
     self.new({
       :tag => :sample,
       :name => "Sample",
-      :models => [:any],
+      :models => ['any'],
       :mandatory => false,
       :multiple => false,
       :default => 'default',
@@ -117,7 +117,7 @@ class MetadataType < ActiveRecord::Base
   
   def self.model_types(model, scope=nil)
     types = Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
-       res = { :any => [] }
+       res = { 'any' => [] }
        self.scheme(scope).each do |tag, type|
          type.models.each do |model| 
       	   res[model] = [] if res[model].blank?
@@ -126,7 +126,7 @@ class MetadataType < ActiveRecord::Base
      	 end
      	 res
     end
-    types[model] ? (types[model] | types[:any]).uniq : types[:any]
+    types[model] ? (types[model] | types['any']).uniq : types['any']
   end
   
   def self.type(name, scope=nil)
