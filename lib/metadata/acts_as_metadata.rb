@@ -56,6 +56,11 @@ module ActsAsMetadata
         super
       end
       
+      def attributes=(new_attributes)
+        create_accessors
+        assign_attributes(new_attributes, :without_protection => true)
+      end
+      
       def create_accessors
         metadata_types.each do |type|
           create_accessor type
@@ -63,9 +68,11 @@ module ActsAsMetadata
       end
 
       def create_accessor type
-        class_eval "attr_accessor :#{type}"
-        class_eval "def #{type}; get_metadata('#{type}'); end"
-        class_eval "def #{type}=(value); set_metadata('#{type}', value); end"
+        unless respond_to?(type) and respond_to?("#{type}=")
+          #class_eval "attr_accessor :#{type}"
+          class_eval "def #{type}; get_metadata('#{type}'); end"
+          class_eval "def #{type}=(value); set_metadata('#{type}', value); end"
+        end
       end
 
       def create_accessors_and_save_metadata

@@ -46,7 +46,7 @@ ActiveRecord::Base.connection.create_table(:metadata_types) do |t|
   t.boolean  "multiple",   :default => false
   t.string   "format"
   t.text     "values"
-  t.string   "models",      :default => "--- []"
+  t.string   "models",      :default => [].to_json
   t.text     "default"
   t.datetime "deleted_at"
   t.datetime "created_at"

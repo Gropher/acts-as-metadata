@@ -10,6 +10,20 @@ describe ActsAsMetadata do
     MetadataType.scheme_data.count.should == 1
   end
   
+  it 'has respond to metadata methods' do
+    mymodel = MyModel.new
+    mymodel.respond_to? :sample
+    mymodel.respond_to? :sample=
+  end
+
+  it 'set metadata value via attributes' do
+    mymodel = MyModel.new
+    mymodel.attributes = { 'sample' => 'test' }
+    mymodel.save!
+    mymodel = MyModel.last
+    mymodel.sample.should == 'test'
+  end
+  
   it 'has default metadata value' do
     mymodel = MyModel.create
     mymodel.sample.should == 'default'
