@@ -1,6 +1,6 @@
 module Metadata
   class Metadata < ActiveRecord::Base
-    default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
+    # default_scope :conditions => {:deleted_at => nil}, :order => 'created_at DESC'
     before_save :set_search_value
 
     def undelete
