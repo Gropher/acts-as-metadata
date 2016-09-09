@@ -105,17 +105,13 @@ module ActsAsMetadata
       def metadata_scope
         self.class.class_variable_get('@@metadata_scope') ? self.send(self.class.class_variable_get('@@metadata_scope')) : nil
       end
-  	  
-  	  def model_name
-  	    self.class.name.underscore.to_s
-  	  end
       
       def metadata_type name
         MetadataType.type name, metadata_scope
       end
 
       def metadata_types
-        MetadataType.model_types(model_name, metadata_scope)
+        MetadataType.model_types(model_name.name.underscore.to_s, metadata_scope)
       end
 
 			def self.metadata_types scope=nil
