@@ -17,17 +17,20 @@ module ActsAsMetadata
       def metadata_constraints
         metadata_types.each do |type_name|
           type = MetadataType.type(type_name, metadata_scope)
+          Rails.logger.error "Type method results: "
+          Rails.logger.error type
+          Rails.logger.error type.try("format")
           value = get_metadata(type.tag)
           values = type.values.map {|v| v.is_a?(Array) ? v[1].to_s : v.to_s } rescue []
           if value.is_a? Array
             errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && (value.blank? || value.map(&:blank?).reduce(:&))
             value.each_with_index do |v, i|
-              errors.add("#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && v.present? && v.to_s !~ Regexp.new("^#{type.format}$")
+              errors.add("#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && v.present? && v.to_s !~ Regexp.new("\A#{type.format}\z")
               errors.add("#{type.tag}_#{i}", I18n.t('acts_as_metadata.errors.values')) if values.present? && v.present? && !values.include?(v)
             end
           else
             errors.add(type.tag, I18n.t('acts_as_metadata.errors.blank')) if type.mandatory && value.blank?
-            errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && value.present? && value.to_s !~ Regexp.new("^#{type.format}$")
+            errors.add(type.tag, I18n.t('acts_as_metadata.errors.format')) if values.blank? && type.format.present? && value.present? && value.to_s !~ Regexp.new("\A#{type.format}\z")
             errors.add(type.tag, I18n.t('acts_as_metadata.errors.values')) if values.present? && value.present? && !values.include?(value.to_s)
           end
         end unless @skip_metadata_validation
