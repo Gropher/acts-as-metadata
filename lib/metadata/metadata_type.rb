@@ -46,9 +46,9 @@ class MetadataType < ActiveRecord::Base
 
     case datatype
     when 'date' 
-      ActiveRecord::ConnectionAdapters::Column.string_to_date value
+      Date.parse(value).iso8601 rescue nil
     when 'datetime'
-      ActiveRecord::ConnectionAdapters::Column.string_to_time value
+      DateTime.parse(value).iso8601 rescue nil
     when 'number'
       Integer value
     when 'boolean'
