@@ -52,7 +52,7 @@ class MetadataType < ActiveRecord::Base
     when 'number'
       Integer value
     when 'boolean'
-      ActiveRecord::ConnectionAdapters::Column.value_to_boolean value
+      value == "1"
     else
       value
     end rescue nil
