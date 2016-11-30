@@ -93,8 +93,6 @@ class MetadataType < ActiveRecord::Base
   end
 
   def self.scheme_data(scope=nil)
-    Rails.logger.info "@@metadata_scope == " + @@metadata_scope.to_s
-    Rails.logger.info "scope == " + scope.to_s
     Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_data", :expires_in => 60.minutes) do
 		  uncached do
         scheme_data = scope.blank? ? self.all : self.where(@@metadata_scope => scope).all
@@ -108,8 +106,6 @@ class MetadataType < ActiveRecord::Base
   end
   
   def self.scheme(scope=nil)
-    Rails.logger.info "@@metadata_scope == " + @@metadata_scope.to_s
-    Rails.logger.info "scope == " + scope.to_s
     Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_types", :expires_in => 60.minutes) do
       res = {}
       self.scheme_data(scope).each do |type|
@@ -120,8 +116,6 @@ class MetadataType < ActiveRecord::Base
   end
   
   def self.model_types(model, scope=nil)
-    Rails.logger.info "@@metadata_scope == " + @@metadata_scope.to_s
-    Rails.logger.info "scope == " + scope.to_s
     types = Rails.cache.fetch("metadata_scheme_#{@@metadata_scope}#{scope}_modeltypes", :expires_in => 60.minutes) do
        res = { 'any' => [] }
        self.scheme(scope).each do |tag, type|
