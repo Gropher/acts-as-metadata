@@ -52,7 +52,7 @@ class MetadataType < ActiveRecord::Base
     when 'number'
       Integer value
     when 'boolean'
-      value == "1"
+      value == "1" || value.downcase == "true" 
     else
       value
     end rescue nil
